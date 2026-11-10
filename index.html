@@ -600,7 +600,7 @@ table.t tr:last-child td { border-bottom: 0; }
       <header class="vhead">
         <span class="stepno">Secret · Gabe's idea</span>
         <h1 id="h1-secret">Gabe vs. the Dragon</h1>
-        <p>Senior night. Gabe, #99 and 18, is the last Cougar on the field when a rival dragon drops out of the sky. He's got a bag of soccer balls and a GC shield. Bring it down and keep the bell.</p>
+        <p>Senior night. Gabe, #99 and 18, is the last Cougar on the field when a rival dragon drops out of the sky. He's got a bag of soccer balls and his Paul N shield. Bring it down and keep the bell.</p>
       </header>
       <div class="dwrap" id="dragonWrap">
         <div class="dflash" id="dFlash"></div>
@@ -1578,88 +1578,57 @@ table.t tr:last-child td { border-bottom: 0; }
       document.head.appendChild(sc);
     }
 
-    /* ===== textures (all drawn in code) ===== */
-    function canvasTex(w, h, paint, color) {
-      var c = document.createElement("canvas"); c.width = w; c.height = h; paint(c.getContext("2d"), w, h);
-      var t = new T.CanvasTexture(c); t.anisotropy = renderer.capabilities.getMaxAnisotropy(); if (color !== false) t.encoding = T.sRGBEncoding; return t;
-    }
-    function noise(x, w, h, base, amt, dots) {
-      var img = x.getImageData(0, 0, w, h), d = img.data;
-      for (var i = 0; i < d.length; i += 4) { var n = (Math.random() - 0.5) * amt; d[i] = clamp(d[i] + n, 0, 255); d[i + 1] = clamp(d[i + 1] + n, 0, 255); d[i + 2] = clamp(d[i + 2] + n, 0, 255); }
-      x.putImageData(img, 0, 0);
-    }
-    function grassTex() {
-      return canvasTex(2048, 1320, function (x, w, h) {
-        for (var i = 0; i < 16; i++) { x.fillStyle = i % 2 ? "#2d7a32" : "#27702c"; x.fillRect(i * w / 16, 0, w / 16 + 1, h); }
-        noise(x, w, h, 0, 26);
-        for (var k = 0; k < 9000; k++) { x.fillStyle = Math.random() < 0.5 ? "rgba(20,60,20,.25)" : "rgba(120,170,90,.18)"; x.fillRect(Math.random() * w, Math.random() * h, 2, 3); }
-        x.strokeStyle = "rgba(245,245,240,.92)"; x.lineWidth = 7;
-        x.strokeRect(36, 36, w - 72, h - 72);
-        x.beginPath(); x.moveTo(w / 2, 36); x.lineTo(w / 2, h - 36); x.stroke();
-        x.beginPath(); x.arc(w / 2, h / 2, 180, 0, 7); x.stroke();
-        x.strokeRect(36, h / 2 - 320, 330, 640); x.strokeRect(w - 366, h / 2 - 320, 330, 640);
-        x.strokeRect(36, h / 2 - 140, 110, 280); x.strokeRect(w - 146, h / 2 - 140, 110, 280);
-        x.beginPath(); x.arc(256, h / 2, 180, -0.93, 0.93); x.stroke(); x.beginPath(); x.arc(w - 256, h / 2, 180, Math.PI - 0.93, Math.PI + 0.93); x.stroke();
-        x.fillStyle = "#f5f5f0"; [[w / 2, h / 2], [256, h / 2], [w - 256, h / 2]].forEach(function (p) { x.beginPath(); x.arc(p[0], p[1], 9, 0, 7); x.fill(); });
+    /* ===== textures (all drawn in code, original simple style) ===== */
+    function canvasTex(w, h, paint) { var c = document.createElement("canvas"); c.width = w; c.height = h; paint(c.getContext("2d"), w, h); var t = new T.CanvasTexture(c); t.anisotropy = 4; return t; }
+    function fieldTex() {
+      return canvasTex(1024, 660, function (x, w, h) {
+        for (var i = 0; i < 12; i++) { x.fillStyle = i % 2 ? "#2f8f3a" : "#2a8234"; x.fillRect(i * w / 12, 0, w / 12 + 1, h); }
+        x.strokeStyle = "rgba(255,255,255,.9)"; x.lineWidth = 5;
+        x.strokeRect(20, 20, w - 40, h - 40);
+        x.beginPath(); x.moveTo(w / 2, 20); x.lineTo(w / 2, h - 20); x.stroke();
+        x.beginPath(); x.arc(w / 2, h / 2, 90, 0, 7); x.stroke();
+        x.strokeRect(20, h / 2 - 160, 160, 320); x.strokeRect(w - 180, h / 2 - 160, 160, 320);
+        x.strokeRect(20, h / 2 - 70, 55, 140); x.strokeRect(w - 75, h / 2 - 70, 55, 140);
+        x.fillStyle = "#fff"; x.beginPath(); x.arc(w / 2, h / 2, 6, 0, 7); x.fill();
       });
     }
-    function turfTex() {
-      var t = canvasTex(256, 256, function (x, w, h) { x.fillStyle = "#1d48c4"; x.fillRect(0, 0, w, h); noise(x, w, h, 0, 40); });
-      t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(40, 30); return t;
-    }
-    function jerseyTex() {
-      // LatheGeometry UVs wrap around the body; u = 0.5 is the front, u = 0 / 1 the back.
-      return canvasTex(1024, 512, function (x, w, h) {
-        x.fillStyle = "#cfd2d6"; x.fillRect(0, 0, w, h); noise(x, w, h, 0, 10);
-        x.fillStyle = "#d4ef12"; x.fillRect(0, 0, w, 26);
-        x.beginPath(); x.moveTo(w / 2 - 90, 0); x.lineTo(w / 2, 120); x.lineTo(w / 2 + 90, 0); x.lineTo(w / 2 + 60, 0); x.lineTo(w / 2, 82); x.lineTo(w / 2 - 60, 0); x.closePath(); x.fill();
-        [w * 0.25, w * 0.75].forEach(function (sx) { x.fillRect(sx - 60, 0, 120, 70); }); // shoulder panels
-        x.fillStyle = "#151515"; x.textAlign = "center"; x.font = "900 150px Arial Black, Arial, sans-serif"; x.fillText("99", w / 2 - 70, 330);
-        x.font = "900 230px Arial Black, Arial, sans-serif"; x.fillText("99", 0, 340); x.fillText("99", w, 340);
-        x.fillStyle = "#16478e"; x.fillRect(w / 2 + 70, 170, 64, 80); x.fillStyle = "#fcdb04"; x.fillRect(w / 2 + 82, 182, 40, 56);
-      });
-    }
-    function scaleTex() {
-      var t = canvasTex(512, 512, function (x, w, h) {
-        x.fillStyle = "#6a1016"; x.fillRect(0, 0, w, h);
-        for (var r = 0; r < 18; r++) for (var c = 0; c < 18; c++) {
-          var cx = c * 30 + (r % 2) * 15, cy = r * 30;
-          var g = x.createRadialGradient(cx, cy - 6, 2, cx, cy, 20);
-          g.addColorStop(0, "#a3222b"); g.addColorStop(0.7, "#6a1016"); g.addColorStop(1, "#2c0507");
-          x.fillStyle = g; x.beginPath(); x.arc(cx, cy, 18, 0, Math.PI); x.fill();
-        }
-        noise(x, w, h, 0, 14);
-      });
-      t.wrapS = t.wrapT = T.RepeatWrapping; return t;
-    }
-    function shieldTex() {
-      return canvasTex(512, 512, function (x, w, h) {
-        var g = x.createRadialGradient(w / 2, h / 2 - 60, 30, w / 2, h / 2, 256); g.addColorStop(0, "#2a63b8"); g.addColorStop(1, "#0e3168");
-        x.fillStyle = g; x.beginPath(); x.arc(w / 2, h / 2, 256, 0, 7); x.fill();
-        x.strokeStyle = "#fcdb04"; x.lineWidth = 26; x.beginPath(); x.arc(w / 2, h / 2, 200, 0, 7); x.stroke();
-        x.fillStyle = "#fcdb04"; x.font = "900 200px Arial Black, Arial, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("GC", w / 2, h / 2 + 8);
-        noise(x, w, h, 0, 12);
+    function jerseyTex(back) {
+      return canvasTex(256, 256, function (x, w, h) {
+        x.fillStyle = "#d4d7db"; x.fillRect(0, 0, w, h);
+        x.fillStyle = "#d7f20f"; x.beginPath(); x.moveTo(70, 0); x.lineTo(128, back ? 18 : 70); x.lineTo(186, 0); x.lineTo(160, 0); x.lineTo(128, back ? 8 : 45); x.lineTo(96, 0); x.closePath(); x.fill();
+        x.fillStyle = "#1b1b1b"; x.font = "900 " + (back ? 120 : 70) + "px Arial Black, Arial, sans-serif"; x.textAlign = "center";
+        x.fillText("99", back ? 128 : 110, back ? 170 : 165);
+        if (!back) { x.fillStyle = "#16478e"; x.fillRect(168, 92, 34, 42); x.fillStyle = "#fcdb04"; x.fillRect(176, 100, 18, 26); }
       });
     }
     function ballTex() {
-      return canvasTex(512, 256, function (x, w, h) {
-        x.fillStyle = "#f4f4f4"; x.fillRect(0, 0, w, h); x.fillStyle = "#151515";
-        [[60, 60], [200, 140], [340, 50], [460, 160], [120, 210], [280, 230], [400, 250], [30, 160]].forEach(function (p) {
-          x.beginPath(); for (var i = 0; i < 5; i++) { var a = i / 5 * Math.PI * 2 - Math.PI / 2; x.lineTo(p[0] + Math.cos(a) * 28, p[1] + Math.sin(a) * 28); } x.closePath(); x.fill();
+      return canvasTex(256, 128, function (x, w, h) {
+        x.fillStyle = "#fff"; x.fillRect(0, 0, w, h); x.fillStyle = "#111";
+        [[30, 30], [100, 70], [170, 25], [230, 80], [60, 105], [140, 110], [200, 120]].forEach(function (p) {
+          x.beginPath(); for (var i = 0; i < 5; i++) { var a = i / 5 * Math.PI * 2 - Math.PI / 2; x.lineTo(p[0] + Math.cos(a) * 14, p[1] + Math.sin(a) * 14); } x.closePath(); x.fill();
         });
+      });
+    }
+    function boardTex() {
+      return canvasTex(1024, 64, function (x, w, h) {
+        x.fillStyle = "#16478e"; x.fillRect(0, 0, w, h);
+        x.fillStyle = "#fcdb04"; x.font = "800 40px 'Barlow Condensed', Arial Narrow, sans-serif"; x.textAlign = "center";
+        x.fillText("GO COUGARS  ·  GREENFIELD-CENTRAL  ·  GO COUGARS  ·  #99", w / 2, 46);
+      });
+    }
+    function shieldTex() {
+      return canvasTex(512, 512, function (x, w, h) {
+        x.fillStyle = "#16478e"; x.beginPath(); x.arc(w / 2, h / 2, 256, 0, 7); x.fill();
+        x.strokeStyle = "#fcdb04"; x.lineWidth = 22; x.beginPath(); x.arc(w / 2, h / 2, 205, 0, 7); x.stroke();
+        x.fillStyle = "#fcdb04"; x.textAlign = "center"; x.textBaseline = "middle";
+        x.font = "900 118px Arial Black, Arial, sans-serif"; x.fillText("Paul", w / 2, h / 2 - 55);
+        x.font = "900 150px Arial Black, Arial, sans-serif"; x.fillText("N", w / 2, h / 2 + 80);
       });
     }
     function spriteTex(stops) {
       return canvasTex(128, 128, function (x, w, h) {
         var g = x.createRadialGradient(64, 64, 0, 64, 64, 64);
-        stops.forEach(function (s) { g.addColorStop(s[0], s[1]); }); x.fillStyle = g; x.fillRect(0, 0, w, h);
-      });
-    }
-    function boardTex() {
-      return canvasTex(2048, 96, function (x, w, h) {
-        x.fillStyle = "#0e3168"; x.fillRect(0, 0, w, h);
-        x.fillStyle = "#fcdb04"; x.font = "800 58px 'Barlow Condensed', Arial Narrow, sans-serif"; x.textAlign = "center";
-        x.fillText("GO COUGARS  ·  GREENFIELD-CENTRAL  ·  CLASS OF 2026  ·  GO COUGARS  ·  #99", w / 2, 68);
+        stops.forEach(function (st2) { g.addColorStop(st2[0], st2[1]); }); x.fillStyle = g; x.fillRect(0, 0, w, h);
       });
     }
 
@@ -1683,170 +1652,94 @@ table.t tr:last-child td { border-bottom: 0; }
     function limb(len, r0, r1, mat) { var g = new T.CylinderGeometry(r1, r0, len, 18, 1); g.translate(0, -len / 2, 0); return mesh(g, mat); }
     function joint(r, mat) { return mesh(new T.SphereGeometry(r, 18, 14), mat); }
 
-    /* ===== Gabe: 18, GC senior, #99. Gray kit with neon trim, curly strawberry-blond hair ===== */
+    /* ===== Gabe (original blocky style): 18, GC senior, #99, curly strawberry-blond hair ===== */
+    function bx(w, h, d, m) { return mesh(new T.BoxGeometry(w, h, d), m); }
+    function bl(r, m) { return mesh(new T.SphereGeometry(r, 16, 12), m); }
     function buildGabe() {
-      var g = new T.Group();
-      var skin = std(0xcf9270, { roughness: 0.55 }), jersey = std(0xb9bcc1, { map: jerseyTex(), roughness: 0.85 }), shorts = std(0xa9adb3, { roughness: 0.85 }),
-        neon = std(0xd4ef12, { roughness: 0.6 }), sock = std(0xf2f2f2, { roughness: 0.9 }), shoe = std(0xd9dce1, { metalness: 0.45, roughness: 0.32 }), sole = std(0xf7f7f7, { roughness: 0.6 }),
-        hair = std(0xc0844d, { roughness: 0.9 }), dark = std(0x1e1a18, { roughness: 0.4 }), white = std(0xf5f5f5, { roughness: 0.3 }), iris = std(0x3a6ea5, { roughness: 0.3 });
-      var hips = new T.Group(); hips.position.y = 0.96; g.add(hips); g.hips = hips;
-      var pelvis = mesh(new T.SphereGeometry(1, 24, 16), shorts); pelvis.scale.set(0.175, 0.13, 0.12); pelvis.position.y = 0.02; hips.add(pelvis);
+      var g = new T.Group(), skin = std(0xf0c4a2), kit = std(0xd4d7db), neon = std(0xd7f20f, { emissive: 0x2a3000 }), sock = std(0xf4f4f4), shoe = std(0xc9ccd1, { metalness: 0.5, roughness: 0.35 });
+      var hips = new T.Group(); hips.position.y = 1.0; g.add(hips); g.hips = hips;
       function leg(side) {
-        var L = new T.Group(); L.position.set(0.1 * side, 0, 0); hips.add(L);
-        var shortLeg = limb(0.26, 0.105, 0.092, shorts); L.add(shortLeg);
-        var thigh = limb(0.44, 0.08, 0.06, skin); L.add(thigh);
-        var knee = new T.Group(); knee.position.y = -0.44; L.add(knee);
-        knee.add(joint(0.06, skin));
-        var shin = limb(0.43, 0.058, 0.042, skin); knee.add(shin);
-        var sockM = limb(0.24, 0.056, 0.046, sock); sockM.position.y = -0.19; knee.add(sockM);
-        var ankle = new T.Group(); ankle.position.y = -0.43; knee.add(ankle);
-        var sh = mesh(new T.SphereGeometry(1, 20, 12), shoe); sh.scale.set(0.055, 0.045, 0.135); sh.position.set(0, -0.03, 0.05); ankle.add(sh);
-        var so = mesh(new T.BoxGeometry(0.1, 0.025, 0.27), sole); so.position.set(0, -0.07, 0.05); ankle.add(so);
+        var L = new T.Group(); L.position.set(0.17 * side, 0, 0); hips.add(L);
+        var sh = bx(0.3, 0.34, 0.32, kit); sh.position.y = -0.1; L.add(sh);
+        var thigh = bx(0.2, 0.27, 0.2, skin); thigh.position.y = -0.365; L.add(thigh);
+        var knee = new T.Group(); knee.position.y = -0.5; L.add(knee);
+        var shin = bx(0.2, 0.18, 0.2, skin); shin.position.y = -0.085; knee.add(shin);
+        var so = bx(0.21, 0.26, 0.21, sock); so.position.y = -0.3; knee.add(so);
+        var ankle = new T.Group(); ankle.position.y = -0.46; knee.add(ankle);
+        var shoeM = bx(0.24, 0.14, 0.42, shoe); shoeM.position.set(0, 0, 0.08); ankle.add(shoeM);
         return { hip: L, knee: knee, ankle: ankle };
       }
       g.legL = leg(-1); g.legR = leg(1);
       var spine = new T.Group(); spine.position.y = 0.98; g.add(spine); g.spine = spine;
-      var prof = [[0.135, 0], [0.15, 0.08], [0.165, 0.2], [0.185, 0.34], [0.19, 0.44], [0.17, 0.52], [0.09, 0.58], [0.06, 0.6]].map(function (p) { return new T.Vector2(p[0], p[1]); });
-      var torsoGeo = new T.LatheGeometry(prof, 40, Math.PI, Math.PI * 2);
-      var torso = mesh(torsoGeo, jersey); torso.scale.z = 0.68; spine.add(torso);
-      var neck = limb(0.1, 0.05, 0.055, skin); neck.position.y = 0.66; spine.add(neck);
-      // head
-      var head = new T.Group(); head.position.y = 0.76; spine.add(head); g.head = head;
-      var skull = mesh(new T.SphereGeometry(1, 32, 24), skin); skull.scale.set(0.1, 0.122, 0.113); head.add(skull);
-      var jaw = mesh(new T.SphereGeometry(1, 24, 16), skin); jaw.scale.set(0.085, 0.07, 0.09); jaw.position.set(0, -0.055, 0.018); head.add(jaw);
-      var nose = mesh(new T.ConeGeometry(0.018, 0.05, 12), skin); nose.rotation.x = Math.PI / 2; nose.position.set(0, -0.01, 0.118); head.add(nose);
-      [-1, 1].forEach(function (s) {
-        var ear = mesh(new T.SphereGeometry(1, 12, 10), skin); ear.scale.set(0.014, 0.03, 0.02); ear.position.set(0.1 * s, 0, 0.005); head.add(ear);
-        var eye = mesh(new T.SphereGeometry(0.016, 14, 10), white, false); eye.position.set(0.037 * s, 0.022, 0.097); head.add(eye);
-        var ir = mesh(new T.SphereGeometry(0.0085, 12, 8), iris, false); ir.position.set(0.037 * s, 0.022, 0.111); head.add(ir);
-        var brow = mesh(new T.BoxGeometry(0.035, 0.007, 0.01), std(0x9c6a3c), false); brow.position.set(0.038 * s, 0.047, 0.104); brow.rotation.z = -0.12 * s; head.add(brow);
-      });
-      var mouth = mesh(new T.TorusGeometry(0.02, 0.0035, 6, 16, Math.PI), std(0x9a4c45), false); mouth.rotation.z = Math.PI; mouth.position.set(0, -0.05, 0.106); head.add(mouth);
-      // curly hair: many small curls (instanced)
-      var N = 260, curls = new T.InstancedMesh(new T.SphereGeometry(1, 8, 6), hair, N), m4 = new T.Matrix4(), q = new T.Quaternion(), placed = 0;
-      curls.castShadow = true;
-      for (var i = 0; i < N * 3 && placed < N; i++) {
-        var u = Math.random(), v = Math.random(), th = u * Math.PI * 2, ph = Math.acos(1 - v * 1.25);
-        var x = Math.sin(ph) * Math.cos(th), y = Math.cos(ph), z = Math.sin(ph) * Math.sin(th);
-        if (z > 0.35 && y < 0.55) continue;            // keep the face clear
-        if (y < -0.05 && Math.abs(x) > 0.6) continue;   // above the ears
-        var rr = 0.016 + Math.random() * 0.014;
-        m4.compose(new T.Vector3(x * 0.112, y * 0.132 + 0.012, z * 0.122 - 0.004), q, new T.Vector3(rr, rr, rr));
-        curls.setMatrixAt(placed++, m4);
-      }
-      curls.count = placed; head.add(curls);
-      // arms
+      var front = std(0xffffff, { map: jerseyTex(false), roughness: 0.8 }), back = std(0xffffff, { map: jerseyTex(true), roughness: 0.8 });
+      var torso = mesh(new T.BoxGeometry(0.64, 0.66, 0.36), [kit, kit, kit, kit, front, back]); torso.position.y = 0.38; spine.add(torso);
       function arm(side) {
-        var S = new T.Group(); S.position.set(0.205 * side, 0.5, 0); spine.add(S);
-        var sleeve = limb(0.17, 0.068, 0.062, side < 0 ? jersey : jersey); sleeve.material = std(0xcfd2d6, { roughness: 0.85 }); S.add(sleeve);
-        var cuff = limb(0.03, 0.064, 0.064, neon); cuff.position.y = -0.15; S.add(cuff);
-        var up = limb(0.28, 0.05, 0.043, skin); S.add(up);
-        var elbow = new T.Group(); elbow.position.y = -0.28; S.add(elbow); elbow.add(joint(0.043, skin));
-        var fore = limb(0.26, 0.043, 0.034, skin); elbow.add(fore);
-        var hand = mesh(new T.SphereGeometry(1, 14, 10), skin); hand.scale.set(0.03, 0.05, 0.04); hand.position.y = -0.29; elbow.add(hand);
+        var S = new T.Group(); S.position.set(0.41 * side, 0.64, 0); spine.add(S);
+        var sl = bx(0.2, 0.24, 0.22, neon); sl.position.y = -0.08; S.add(sl);
+        var up = bx(0.15, 0.24, 0.15, skin); up.position.y = -0.26; S.add(up);
+        var elbow = new T.Group(); elbow.position.y = -0.38; S.add(elbow);
+        var fore = bx(0.15, 0.26, 0.15, skin); fore.position.y = -0.1; elbow.add(fore);
         return { shoulder: S, elbow: elbow };
       }
       g.armL = arm(-1); g.armR = arm(1);
-      // shield: carried on the back, raised in front when blocking
+      var neck = bx(0.14, 0.12, 0.14, skin); neck.position.y = 0.76; spine.add(neck);
+      var head = new T.Group(); head.position.y = 1.0; spine.add(head); g.head = head;
+      head.add(bl(0.27, skin));
+      var hairMat = std(0xc98a4e, { roughness: 0.95 });
+      for (var i = 0; i < 26; i++) {
+        var th = Math.random() * Math.PI * 2, ph = Math.random() * 1.15, r = 0.27;
+        var cx = Math.sin(ph) * Math.cos(th) * r, cz = Math.sin(ph) * Math.sin(th) * r, cy = Math.cos(ph) * r;
+        if (cz > 0.12 && cy < 0.12) continue; // keep the face clear
+        var c = bl(0.085 + Math.random() * 0.05, hairMat); c.position.set(cx, cy + 0.03, cz - 0.02); head.add(c);
+      }
+      var eyeM = std(0x1b1b1b), e1 = bl(0.03, eyeM), e2 = bl(0.03, eyeM); e1.position.set(-0.09, 0.03, 0.25); e2.position.set(0.09, 0.03, 0.25); head.add(e1, e2);
+      var smile = mesh(new T.TorusGeometry(0.07, 0.012, 6, 12, Math.PI), eyeM); smile.rotation.z = Math.PI; smile.position.set(0, -0.07, 0.25); head.add(smile);
+      // the "Paul N" shield: slung at his side, raised in front when blocking
       var shield = new T.Group();
-      var face = mesh(new T.CylinderGeometry(0.33, 0.33, 0.035, 48), [std(0x9aa3b0, { metalness: 0.7, roughness: 0.3 }), std(0xffffff, { map: shieldTex(), metalness: 0.35, roughness: 0.4 }), std(0x0e3168, { roughness: 0.6 })]);
+      var face = mesh(new T.CylinderGeometry(0.42, 0.42, 0.06, 32), [std(0x9aa3b0, { metalness: 0.6, roughness: 0.35 }), std(0xffffff, { map: shieldTex(), roughness: 0.5 }), std(0x0e3168)]);
       face.rotation.x = Math.PI / 2; shield.add(face);
-      var rim = mesh(new T.TorusGeometry(0.33, 0.022, 10, 48), std(0xfcdb04, { metalness: 0.8, roughness: 0.25 })); shield.add(rim);
+      shield.add(mesh(new T.TorusGeometry(0.42, 0.03, 8, 32), std(0xfcdb04, { metalness: 0.6, roughness: 0.35 })));
       g.add(shield); g.shield = shield;
-      g.traverse(function (o) { if (o.isMesh) o.castShadow = true; });
       return g;
     }
 
-    /* ===== the rival dragon: original design, about 22 m wingspan ===== */
+    /* ===== the rival dragon (original simple style) ===== */
     function buildDragon() {
-      var d = new T.Group(), sTex = scaleTex();
-      var scales = std(0xffffff, { map: sTex, bumpMap: sTex, bumpScale: 0.06, roughness: 0.5, metalness: 0.08, vertexColors: true });
-      var horn = std(0xd8c9a8, { roughness: 0.55 }), tooth = std(0xf3efe4, { roughness: 0.3 }), membrane = std(0x2e0609, { side: T.DoubleSide, roughness: 0.85, emissive: 0x0d0102 });
-      var claw = std(0x1b1412, { roughness: 0.35 });
-      function bellyColors(geo) {
-        var n = geo.attributes.normal, c = new Float32Array(n.count * 3);
-        for (var i = 0; i < n.count; i++) { var b = Math.max(0, -n.getY(i)); c[i * 3] = 1 + b * 0.5; c[i * 3 + 1] = 1 + b * 1.4; c[i * 3 + 2] = 1 + b * 0.6; }
-        geo.setAttribute("color", new T.BufferAttribute(c, 3)); return geo;
+      var d = new T.Group(), scale = std(0x8f1d24, { roughness: 0.6 }), belly = std(0xd08a46), dark = std(0x4a0d12, { side: T.DoubleSide, roughness: 0.8 }), horn = std(0xe8dcc0);
+      d.scales = scale; d.nostrils = [];
+      var body = new T.Group(); d.add(body); d.body = body;
+      d.segs = [];
+      for (var i = 0; i < 9; i++) {
+        var r = i < 3 ? 1.4 - i * 0.1 : Math.max(0.25, 1.2 - (i - 2) * 0.16);
+        var sgm = bl(r, i === 1 ? belly : scale); sgm.position.set(0, 0, -i * 1.15); body.add(sgm); d.segs.push(sgm);
+        if (i < 7) { var spike = mesh(new T.ConeGeometry(0.18, 0.6, 6), horn); spike.position.set(0, r + 0.15, -i * 1.15); body.add(spike); }
       }
-      d.bellyColors = bellyColors; d.scales = scales;
-      sTex.repeat.set(10, 3);
-      var bodyPts = [[0, 1.5, 5.4], [0, 0.9, 4.2], [0, 0.25, 2.8], [0, 0, 1.2], [0, -0.05, -0.6], [0, 0.05, -2.4], [0, 0.15, -3.6]].map(function (p) { return new T.Vector3(p[0], p[1], p[2]); });
-      var body = mesh(bellyColors(taperGeo(bodyPts, function (t) { return t < 0.3 ? 0.42 + t / 0.3 * 0.83 : t < 0.65 ? 1.25 : 1.25 - (t - 0.65) / 0.35 * 0.5; }, 90, 22)), scales);
-      d.add(body); d.body = body;
-      // tail is rebuilt each frame so it can sway
-      d.tail = mesh(new T.BufferGeometry(), scales); d.add(d.tail);
-      d.tailSpikes = [];
-      for (var i = 0; i < 9; i++) { var sp = mesh(new T.ConeGeometry(0.16 - i * 0.012, 0.55 - i * 0.03, 8), horn); d.add(sp); d.tailSpikes.push(sp); }
-      // back spikes
-      for (var b = 0; b < 8; b++) { var bs = mesh(new T.ConeGeometry(0.2, 0.75, 8), horn); var pp = new T.CatmullRomCurve3(bodyPts).getPointAt(0.15 + b * 0.1); bs.position.set(0, pp.y + 1.05, pp.z); bs.rotation.x = -0.35; d.add(bs); }
-      // head
-      var head = new T.Group(); head.position.set(0, 1.85, 6.0); d.add(head); d.head = head;
-      var cran = mesh(bellyColors(new T.SphereGeometry(0.62, 32, 24)), scales); cran.scale.set(0.9, 0.78, 1.05); head.add(cran);
-      var snoutG = new T.CylinderGeometry(0.24, 0.46, 1.6, 24, 4); snoutG.rotateX(Math.PI / 2); snoutG.translate(0, -0.08, 1.15);
-      var snout = mesh(bellyColors(snoutG), scales); snout.scale.x = 0.92; head.add(snout);
-      var jawPivot = new T.Group(); jawPivot.position.set(0, -0.3, 0.25); head.add(jawPivot); d.jaw = jawPivot;
-      var jawG = new T.CylinderGeometry(0.18, 0.36, 1.55, 20, 3); jawG.rotateX(Math.PI / 2); jawG.translate(0, -0.05, 0.8);
-      var jaw = mesh(bellyColors(jawG), scales); jaw.scale.y = 0.55; jawPivot.add(jaw);
+      var neck = new T.Group(); neck.position.set(0, 0.3, 1.1); body.add(neck);
+      for (var n = 0; n < 3; n++) { var ns = bl(0.75 - n * 0.1, scale); ns.position.set(0, n * 0.35, n * 0.75); neck.add(ns); }
+      var head = new T.Group(); head.position.set(0, 1.15, 2.7); neck.add(head); d.head = head;
+      head.add(bx(1.2, 0.9, 1.4, scale));
+      var snout = bx(0.8, 0.5, 1.0, scale); snout.position.set(0, -0.15, 1.1); head.add(snout);
+      var jawPivot = new T.Group(); jawPivot.position.set(0, -0.4, 0.45); head.add(jawPivot); d.jaw = jawPivot;
+      var jaw = bx(0.75, 0.2, 1.0, belly); jaw.position.set(0, -0.08, 0.5); jawPivot.add(jaw);
       [-1, 1].forEach(function (s) {
-        for (var t = 0; t < 7; t++) {
-          var up = mesh(new T.ConeGeometry(0.035, 0.17, 6), tooth); up.rotation.x = Math.PI; up.position.set(0.22 * s - t * 0.012 * s, -0.33, 0.55 + t * 0.2); head.add(up);
-          var lo = mesh(new T.ConeGeometry(0.03, 0.13, 6), tooth); lo.position.set(0.17 * s - t * 0.01 * s, 0.07, 0.35 + t * 0.19); jawPivot.add(lo);
-        }
-        var hornG = taperGeo([[0.32 * s, 0.35, -0.2], [0.5 * s, 0.75, -0.75], [0.48 * s, 0.95, -1.35], [0.32 * s, 0.9, -1.85]].map(function (p) { return new T.Vector3(p[0], p[1], p[2]); }), lerpR(0.17, 0.015), 20, 10);
-        head.add(mesh(hornG, horn));
-        var horn2 = taperGeo([[0.45 * s, 0.0, -0.3], [0.75 * s, 0.05, -0.75], [0.85 * s, 0.2, -1.1]].map(function (p) { return new T.Vector3(p[0], p[1], p[2]); }), lerpR(0.09, 0.01), 12, 8);
-        head.add(mesh(horn2, horn));
-        var brow = mesh(new T.SphereGeometry(1, 16, 10), scales); brow.scale.set(0.2, 0.09, 0.28); brow.position.set(0.3 * s, 0.32, 0.42); brow.rotation.z = 0.35 * s; head.add(brow);
-        var eye = new T.Mesh(new T.SphereGeometry(0.1, 16, 12), new T.MeshBasicMaterial({ color: 0xffb800 })); eye.position.set(0.37 * s, 0.2, 0.5); head.add(eye);
-        var pupil = new T.Mesh(new T.BoxGeometry(0.02, 0.15, 0.02), new T.MeshBasicMaterial({ color: 0x150500 })); pupil.position.set(0.44 * s, 0.2, 0.55); head.add(pupil);
-        var eg = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffa000, blending: T.AdditiveBlending, depthWrite: false, transparent: true })); eg.scale.set(0.7, 0.7, 1); eg.position.copy(eye.position); head.add(eg);
-        var nost = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xff5a00, blending: T.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.3 })); nost.scale.set(0.35, 0.35, 1); nost.position.set(0.1 * s, -0.02, 1.95); head.add(nost);
-        (d.nostrils = d.nostrils || []).push(nost);
+        var hn = mesh(new T.ConeGeometry(0.16, 1.1, 8), horn); hn.position.set(0.4 * s, 0.6, -0.5); hn.rotation.x = -0.9; head.add(hn);
+        var eye = new T.Mesh(new T.SphereGeometry(0.13, 10, 8), new T.MeshBasicMaterial({ color: 0xffc400 })); eye.position.set(0.45 * s, 0.15, 0.45); head.add(eye);
       });
-      // wings
-      function wing(s) {
-        var W = new T.Group(); W.position.set(0.85 * s, 0.85, 2.3); d.add(W);
-        var V = function (x, y, z) { return new T.Vector3(x * s, y, z); };
-        var root = V(0, 0, 0), elbow = V(3.2, 0.7, -0.6), wrist = V(6.4, 0.4, -1.1);
-        var tips = [V(11.2, -0.3, -1.6), V(10.4, -0.8, -3.6), V(8.2, -1.0, -5.4), V(5.4, -0.8, -6.5)], back = V(0.4, -0.3, -4.4);
-        W.add(mesh(taperGeo([root, V(1.6, 0.45, -0.2), elbow], lerpR(0.28, 0.17), 16, 12), scales));
-        W.add(mesh(taperGeo([elbow, V(4.8, 0.65, -0.85), wrist], lerpR(0.17, 0.12), 16, 12), scales));
-        tips.forEach(function (tp) { var mid = wrist.clone().lerp(tp, 0.5); mid.y += 0.15; W.add(mesh(taperGeo([wrist, mid, tp], lerpR(0.1, 0.02), 14, 8), scales)); });
-        var thumb = mesh(new T.ConeGeometry(0.08, 0.5, 8), claw); thumb.position.copy(wrist).add(V(0.1, 0.3, 0.2)); thumb.rotation.x = -0.5; W.add(thumb);
-        // membrane with a scalloped trailing edge between fingers
-        var pts = [], tri = function (a, b, c) { pts.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z); };
-        tri(root, elbow, wrist); tri(root, wrist, back);
-        var edge = tips.concat([back]);
-        for (var e = 0; e < edge.length - 1; e++) {
-          var m = edge[e].clone().lerp(edge[e + 1], 0.5).lerp(wrist, 0.2);
-          tri(wrist, edge[e], m); tri(wrist, m, edge[e + 1]);
-        }
-        var mg = new T.BufferGeometry(); mg.setAttribute("position", new T.Float32BufferAttribute(pts, 3)); mg.computeVertexNormals();
-        var mem = new T.Mesh(mg, membrane); mem.castShadow = true; W.add(mem);
-        return W;
+      function wing(side) {
+        var geo = new T.BufferGeometry();
+        var v = new Float32Array([0, 0, 0, 7 * side, 1.5, -1, 0, 0, -3.5, 7 * side, 1.5, -1, 5 * side, -0.5, -4.5, 0, 0, -3.5, 7 * side, 1.5, -1, 9 * side, -1, -2.5, 5 * side, -0.5, -4.5]);
+        geo.setAttribute("position", new T.BufferAttribute(v, 3)); geo.computeVertexNormals();
+        var W = new T.Group(); W.position.set(0.8 * side, 0.6, 0.4);
+        var mem = new T.Mesh(geo, dark); mem.castShadow = true; W.add(mem);
+        var bone = bx(0.15, 0.15, 7.2, scale); bone.position.set(3.5 * side, 0.75, -0.5); bone.rotation.y = Math.PI / 2 * side * 0.98; W.add(bone);
+        body.add(W); return W;
       }
       d.wingL = wing(-1); d.wingR = wing(1);
-      // legs, tucked for flight
-      function legs(z, y, s, big) {
-        var hip = V3(0.9 * s, y, z), knee = V3(1.2 * s, y - 1.2, z - 0.9), foot = V3(1.05 * s, y - 1.7, z - 2.2);
-        d.add(mesh(taperGeo([hip, knee, foot], lerpR(big ? 0.55 : 0.32, 0.14), 16, 12), scales));
-        for (var c = -1; c <= 1; c++) { var cl = mesh(new T.ConeGeometry(0.06, 0.32, 6), claw); cl.position.copy(foot).add(V3(c * 0.12, -0.05, -0.12)); cl.rotation.x = -2.2; d.add(cl); }
-      }
-      function V3(x, y, z) { return new T.Vector3(x, y, z); }
-      legs(-2.2, -0.3, -1, true); legs(-2.2, -0.3, 1, true); legs(2.6, -0.2, -1, false); legs(2.6, -0.2, 1, false);
-      d.traverse(function (o) { if (o.isMesh) o.castShadow = true; });
-      d.flashMats = [scales];
+      [-1, 1].forEach(function (s) { var lg = bx(0.4, 1.2, 0.4, scale); lg.position.set(0.8 * s, -1.3, -1.6); body.add(lg); });
       return d;
     }
-    function updateTail(t, sway) {
-      var pts = [[0, 0.15, -3.4], [0, 0.2, -5.4], [Math.sin(t * 2) * sway, 0.4, -7.4], [Math.sin(t * 2 - 0.8) * sway * 1.8, 0.75, -9.4], [Math.sin(t * 2 - 1.6) * sway * 2.6, 1.15, -11.4], [Math.sin(t * 2 - 2.3) * sway * 3.2, 1.5, -13]]
-        .map(function (p) { return new T.Vector3(p[0], p[1], p[2]); });
-      var old = dragon.tail.geometry;
-      dragon.tail.geometry = dragon.bellyColors(taperGeo(pts, function (u) { return 0.78 * Math.pow(1 - u, 1.15) + 0.04; }, 48, 14));
-      old.dispose();
-      var curve = new T.CatmullRomCurve3(pts);
-      dragon.tailSpikes.forEach(function (sp, i) { var p = curve.getPointAt(0.05 + i * 0.1); var r = 0.78 * Math.pow(1 - (0.05 + i * 0.1), 1.15) + 0.04; sp.position.set(p.x, p.y + r + 0.15, p.z); sp.rotation.x = -0.4; });
-    }
+    // the tail is the back of the body chain; it sways side to side
+    function updateTail(t, sway) { dragon.segs.forEach(function (sg, i) { sg.position.x = Math.sin(t * 3 - i * 0.6) * 0.18 * i * (sway / 0.35); }); }
 
     /* ===== effects: pooled sprites for fire, smoke, sparks, confetti ===== */
     var sprites = [];
@@ -1882,74 +1775,45 @@ table.t tr:last-child td { border-bottom: 0; }
       for (var i = 0; i < n; i++) spawn({ p: p, v: new T.Vector3((Math.random() - 0.5), Math.random() * 0.9, (Math.random() - 0.5)).normalize().multiplyScalar(speed * (0.4 + Math.random() * 0.6)), g: 9, life: 0.5 + Math.random() * 0.5, s0: size, s1: size * 0.3, c: c, c1: c1, drag: 1.5 });
     }
 
-    /* ===== scene ===== */
+    /* ===== scene (original simple style) ===== */
     function init() {
       T = window.THREE;
-      renderer = new T.WebGLRenderer({ antialias: !mobile, powerPreference: "high-performance" });
+      renderer = new T.WebGLRenderer({ antialias: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2));
-      renderer.outputEncoding = T.sRGBEncoding;
-      renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.92;
       renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
       wrap.insertBefore(renderer.domElement, wrap.firstChild);
       renderer.domElement.addEventListener("contextmenu", function (e) { e.preventDefault(); });
       scene = new T.Scene();
-      scene.fog = new T.FogExp2(0x0a1226, 0.0075);
-      camera = new T.PerspectiveCamera(58, 16 / 9, 0.1, 600);
+      scene.background = new T.Color(0x0b1430); scene.fog = new T.Fog(0x0b1430, 70, 190);
+      camera = new T.PerspectiveCamera(60, 16 / 9, 0.1, 500);
       glowTex = spriteTex([[0, "rgba(255,255,255,1)"], [0.25, "rgba(255,255,255,.8)"], [0.6, "rgba(255,255,255,.18)"], [1, "rgba(255,255,255,0)"]]);
       smokeTex = spriteTex([[0, "rgba(60,55,55,.7)"], [0.6, "rgba(40,38,40,.3)"], [1, "rgba(30,30,30,0)"]]);
-      // night sky dome
-      var sky = new T.Mesh(new T.SphereGeometry(400, 32, 16), new T.MeshBasicMaterial({ side: T.BackSide, fog: false, map: canvasTex(16, 256, function (x, w, h) {
-        var g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "#02040c"); g.addColorStop(0.45, "#0a1430"); g.addColorStop(0.62, "#1b2a55"); g.addColorStop(1, "#0a1226"); x.fillStyle = g; x.fillRect(0, 0, w, h);
-      }) }));
-      scene.add(sky);
+      scene.add(new T.HemisphereLight(0x9fbaff, 0x14301a, 0.75));
+      var sun = new T.DirectionalLight(0xffffff, 0.9); sun.position.set(25, 60, 30); sun.castShadow = true;
+      sun.shadow.mapSize.set(1024, 1024); var sc = sun.shadow.camera; sc.left = -60; sc.right = 60; sc.top = 45; sc.bottom = -45; sc.far = 160;
+      scene.add(sun);
+      var turf = new T.Mesh(new T.PlaneGeometry(260, 200), std(0x1f4fd1, { roughness: 0.95 })); turf.rotation.x = -Math.PI / 2; turf.position.y = -0.02; turf.receiveShadow = true; scene.add(turf);
+      var field = new T.Mesh(new T.PlaneGeometry(104, 67), new T.MeshStandardMaterial({ map: fieldTex(), roughness: 0.95 })); field.rotation.x = -Math.PI / 2; field.receiveShadow = true; scene.add(field);
+      var white = std(0xffffff), net = new T.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.35 });
+      [-1, 1].forEach(function (s) {
+        var x = 51 * s;
+        [-3.66, 3.66].forEach(function (z) { var post = new T.Mesh(new T.CylinderGeometry(0.08, 0.08, 2.44, 8), white); post.position.set(x, 1.22, z); scene.add(post); });
+        var bar = new T.Mesh(new T.CylinderGeometry(0.08, 0.08, 7.32, 8), white); bar.rotation.x = Math.PI / 2; bar.position.set(x, 2.44, 0); scene.add(bar);
+        var nb = new T.Mesh(new T.BoxGeometry(2, 2.44, 7.32, 4, 4, 12), net); nb.position.set(x + 1 * s, 1.22, 0); scene.add(nb);
+      });
+      var bt = boardTex();
+      [-1, 1].forEach(function (s) { var b = new T.Mesh(new T.PlaneGeometry(100, 1.4), new T.MeshBasicMaterial({ map: bt })); b.position.set(0, 0.7, 37 * s); if (s > 0) b.rotation.y = Math.PI; scene.add(b); });
+      [[-58, -42], [58, -42], [-58, 42], [58, 42]].forEach(function (p) {
+        var pole = new T.Mesh(new T.CylinderGeometry(0.4, 0.6, 30, 8), std(0x777f8c)); pole.position.set(p[0], 15, p[1]); scene.add(pole);
+        var lamp = new T.Mesh(new T.BoxGeometry(5, 3, 1), new T.MeshBasicMaterial({ color: 0xfffbe6 })); lamp.position.set(p[0], 30, p[1]); lamp.lookAt(0, 0, 0); scene.add(lamp);
+      });
       var sg = new T.BufferGeometry(), sp = [];
-      for (var i = 0; i < 1400; i++) { var th = Math.random() * Math.PI * 2, ph = Math.random() * 1.25, R = 380; sp.push(Math.sin(ph) * Math.cos(th) * R, Math.cos(ph) * R, Math.sin(ph) * Math.sin(th) * R); }
+      for (var i = 0; i < 700; i++) { var th = Math.random() * Math.PI * 2, ph = Math.random() * 1.2, R = 220; sp.push(Math.sin(ph) * Math.cos(th) * R, Math.cos(ph) * R * 0.6 + 40, Math.sin(ph) * Math.sin(th) * R); }
       sg.setAttribute("position", new T.Float32BufferAttribute(sp, 3));
-      scene.add(new T.Points(sg, new T.PointsMaterial({ color: 0xffffff, size: 1.3, fog: false, transparent: true, opacity: 0.85 })));
-      var moon = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xdfe8ff, fog: false })); moon.scale.set(28, 28, 1); moon.position.set(-160, 190, -260); scene.add(moon);
-      // lighting: soft sky fill, moonlight, four floodlight towers
-      scene.add(new T.HemisphereLight(0x5d74b8, 0x0b1a0e, 0.45));
-      var moonL = new T.DirectionalLight(0x9fb4ff, 0.25); moonL.position.set(-80, 120, -100); scene.add(moonL);
-      [[-62, -46], [62, -46], [-62, 46], [62, 46]].forEach(function (p, idx) {
-        var pole = mesh(new T.CylinderGeometry(0.45, 0.7, 34, 12), std(0x6d7684, { metalness: 0.6, roughness: 0.4 })); pole.position.set(p[0], 17, p[1]); scene.add(pole);
-        var rack = mesh(new T.BoxGeometry(7, 4, 0.8), std(0x2b2f36, { metalness: 0.6, roughness: 0.5 })); rack.position.set(p[0], 34, p[1]); rack.lookAt(0, 0, 0); scene.add(rack);
-        for (var lx = -1; lx <= 1; lx++) for (var ly = 0; ly < 2; ly++) {
-          var bulb = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xfff4d6, blending: T.AdditiveBlending, depthWrite: false })); bulb.scale.set(4.5, 4.5, 1);
-          bulb.position.set(p[0] + lx * 2.1 * Math.sign(-p[1]), 33 + ly * 1.6, p[1]); bulb.position.lerp(new T.Vector3(0, 30, 0), 0.01); scene.add(bulb);
-        }
-        var spot = new T.SpotLight(0xfff1d6, 1.55, 260, 0.72, 0.55, 1);
-        spot.position.set(p[0], 34, p[1]); spot.target.position.set(p[0] * 0.15, 0, p[1] * 0.15);
-        if (idx === 0) { spot.castShadow = true; spot.shadow.mapSize.set(mobile ? 1024 : 2048, mobile ? 1024 : 2048); spot.shadow.bias = -0.0004; spot.shadow.camera.near = 10; spot.shadow.camera.far = 140; }
-        scene.add(spot); scene.add(spot.target);
-      });
-      // field, turf, goals, flags, boards, bleachers
-      var turf = mesh(new T.PlaneGeometry(320, 240), std(0xffffff, { map: turfTex(), roughness: 0.95 })); turf.rotation.x = -Math.PI / 2; turf.position.y = -0.02; scene.add(turf);
-      var gt = grassTex(), field = mesh(new T.PlaneGeometry(104, 67), std(0xffffff, { map: gt, roughness: 1 })); field.rotation.x = -Math.PI / 2; scene.add(field);
-      var white = std(0xf4f4f4, { roughness: 0.35, metalness: 0.2 }), netM = new T.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.28 });
-      [-1, 1].forEach(function (s) {
-        var x = 52 * s;
-        [-3.66, 3.66].forEach(function (z) { var post = mesh(new T.CylinderGeometry(0.06, 0.06, 2.44, 12), white); post.position.set(x, 1.22, z); scene.add(post); });
-        var bar = mesh(new T.CylinderGeometry(0.06, 0.06, 7.32, 12), white); bar.rotation.x = Math.PI / 2; bar.position.set(x, 2.44, 0); scene.add(bar);
-        var nb = new T.Mesh(new T.BoxGeometry(2, 2.44, 7.32, 6, 8, 24), netM); nb.position.set(x + 1 * s, 1.22, 0); scene.add(nb);
-        [-33.5, 33.5].forEach(function (z) {
-          var fp = mesh(new T.CylinderGeometry(0.03, 0.03, 1.5, 6), std(0xfcdb04)); fp.position.set(x, 0.75, z); scene.add(fp);
-          var fl = mesh(new T.PlaneGeometry(0.5, 0.35), std(0x16478e, { side: T.DoubleSide })); fl.position.set(x + 0.25 * s, 1.3, z); scene.add(fl);
-        });
-      });
-      var bt = boardTex(); bt.wrapS = T.RepeatWrapping;
-      [-1, 1].forEach(function (s) {
-        var b = mesh(new T.BoxGeometry(108, 1.1, 0.2), [std(0x0e3168), std(0x0e3168), std(0x0e3168), std(0x0e3168), std(0xffffff, { map: bt, emissive: 0xffffff, emissiveMap: bt, emissiveIntensity: 0.55 }), std(0xffffff, { map: bt, emissive: 0xffffff, emissiveMap: bt, emissiveIntensity: 0.55 })]);
-        b.position.set(0, 0.55, 37.5 * s); scene.add(b);
-      });
-      var bleach = std(0x50565f, { metalness: 0.5, roughness: 0.55 }), seat = std(0x8a929c, { metalness: 0.6, roughness: 0.4 });
-      for (var r = 0; r < 9; r++) { var st1 = mesh(new T.BoxGeometry(70, 0.5, 1.2), r % 2 ? seat : bleach); st1.position.set(0, 0.4 + r * 0.55, -41 - r * 1.1); scene.add(st1); }
-      var press = mesh(new T.BoxGeometry(16, 3.5, 3.5), std(0x16478e, { roughness: 0.6 })); press.position.set(0, 7.2, -51); scene.add(press);
-      var pressW = new T.Mesh(new T.PlaneGeometry(14, 1.4), new T.MeshBasicMaterial({ color: 0xffe9a8 })); pressW.position.set(0, 7.6, -49.24); scene.add(pressW);
-      // characters + projectiles
+      scene.add(new T.Points(sg, new T.PointsMaterial({ color: 0xffffff, size: 0.9, fog: false })));
       gabe = buildGabe(); scene.add(gabe);
       dragon = buildDragon(); scene.add(dragon);
-      ballGeo = new T.SphereGeometry(0.11, 24, 16); ballMat = std(0xffffff, { map: ballTex(), roughness: 0.45 });
-      for (var f = 0; f < 2; f++) { var pl = new T.PointLight(0xff7a1a, 0, 22, 2); scene.add(pl); fireLights.push(pl); }
+      ballGeo = new T.SphereGeometry(0.3, 16, 12); ballMat = new T.MeshStandardMaterial({ map: ballTex(), roughness: 0.5 });
       clock = new T.Clock();
       bindControls();
       ready = true;
@@ -1979,7 +1843,7 @@ table.t tr:last-child td { border-bottom: 0; }
     function resize() {
       if (!ready) return;
       var w = wrap.clientWidth, h = wrap.clientHeight; if (!w || !h) return;
-      renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 1 ? 70 : 58; camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 1 ? 72 : 60; camera.updateProjectionMatrix();
     }
     window.addEventListener("resize", function () { if (visible) resize(); });
 
@@ -2011,8 +1875,8 @@ table.t tr:last-child td { border-bottom: 0; }
 
     /* ===== combat ===== */
     function v3(x, y, z) { return new T.Vector3(x, y, z); }
-    function mouthPos() { var m = v3(0, -0.1, 2.0); dragon.head.localToWorld(m); return m; }
-    function gabeCenter() { return gabe.position.clone().add(v3(0, 1.15, 0)); }
+    function mouthPos() { var m = v3(0, -0.2, 1.6); dragon.head.localToWorld(m); return m; }
+    function gabeCenter() { return gabe.position.clone().add(v3(0, 1.3, 0)); }
     // true if the shield is up and facing the attack
     function blocked(fromPos) {
       if (!st.blocking) return false;
@@ -2041,11 +1905,10 @@ table.t tr:last-child td { border-bottom: 0; }
     }
     function fireball(target, speed, big) {
       var g = new T.Group();
-      var core = new T.Mesh(new T.SphereGeometry(big ? 0.38 : 0.28, 16, 12), new T.MeshBasicMaterial({ color: 0xffc06a })); g.add(core);
-      var halo = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xff6a10, blending: T.AdditiveBlending, depthWrite: false, transparent: true })); halo.scale.set(big ? 3.6 : 2.6, big ? 3.6 : 2.6, 1); halo.material.opacity = 0.9; g.add(halo);
+      g.add(new T.Mesh(new T.SphereGeometry(big ? 0.9 : 0.7, 12, 10), new T.MeshBasicMaterial({ color: 0xff7a1a })));
       var from = mouthPos(); g.position.copy(from); scene.add(g);
       st.fires.push({ g: g, v: target.clone().sub(from).normalize().multiplyScalar(speed), life: 6, dmg: big ? 2 : 1 });
-      dragon.jawOpen = 0.6;
+      dragon.jawOpen = 0.5;
     }
     function volley() {
       var n = st.phase === 1 ? 1 : st.phase === 2 ? 3 : 5, gp = gabeCenter();
@@ -2125,8 +1988,8 @@ table.t tr:last-child td { border-bottom: 0; }
       } else gabe.armL.shoulder.rotation.z = 0;
       // shield: on the back, or raised in front
       var sh = gabe.shield;
-      if (st.blocking) { sh.position.lerp(v3(-0.05, 1.32, 0.45), Math.min(1, dt * 18)); sh.rotation.set(0, 0, 0); gabe.armL.shoulder.rotation.x = -1.35; gabe.armL.elbow.rotation.x = -1.2; gabe.armL.shoulder.rotation.z = -0.35; }
-      else { sh.position.lerp(v3(-0.27, 1.15, -0.12), Math.min(1, dt * 10)); sh.rotation.set(0, -Math.PI / 2 - 0.35, 0.15); } // slung on his left side so #99 shows
+      if (st.blocking) { sh.position.lerp(v3(-0.05, 1.42, 0.5), Math.min(1, dt * 18)); sh.rotation.set(0, 0, 0); gabe.armL.shoulder.rotation.x = -1.35; gabe.armL.elbow.rotation.x = -1.2; gabe.armL.shoulder.rotation.z = -0.35; }
+      else { sh.position.lerp(v3(-0.5, 1.32, -0.05), Math.min(1, dt * 10)); sh.rotation.set(0, -Math.PI / 2 - 0.35, 0.15); } // slung on his left side so #99 shows
       // kick
       st.kickCd -= dt;
       if ((keys.kick || keys.kickTap) && st.kickCd <= 0 && !st.blocking) { kick(); st.kickCd = 0.32; }
@@ -2219,15 +2082,13 @@ table.t tr:last-child td { border-bottom: 0; }
       var gc = gabeCenter();
       st.fires.forEach(function (f) {
         f.g.position.addScaledVector(f.v, dt); f.life -= dt;
-        f.g.children[1].material.rotation += dt * 4;
-        if (Math.random() < 0.9) spawn({ p: f.g.position.clone(), v: f.v.clone().multiplyScalar(-0.08).add(v3((Math.random() - .5), Math.random() * 0.6, (Math.random() - .5))), life: 0.45, s0: 1.4, s1: 0.3, c: 0xffb347, c1: 0x801000 });
+        f.g.scale.setScalar(1 + Math.sin(st.t * 30) * 0.12);
         if (f.g.position.distanceTo(gc) < 1.25) {
           f.life = 0;
           if (blocked(f.g.position)) blockHit(f.dmg > 1 ? 30 : 18, f.g.position); else { hurt(f.dmg, f.g.position, 3); burst(f.g.position, 16, 0xffd27a, 0xb02000, 10, 1); }
         }
         if (f.g.position.y <= 0.35) {
           f.life = 0; burst(f.g.position, 14, 0xffd27a, 0xb02000, 9, 1.1);
-          spawn({ p: f.g.position.clone(), v: v3(0, 1.4, 0), life: 1.6, s0: 1.5, s1: 4.5, c: 0xffffff, smoke: true, a: 0.55 });
           if (f.g.position.distanceTo(gabe.position) < 2.2 && !blocked(f.g.position)) hurt(1, f.g.position, 2.5);
         }
       });
@@ -2259,12 +2120,12 @@ table.t tr:last-child td { border-bottom: 0; }
       update(dt);
       // camera: behind Gabe, facing the dragon, with a little shake on big hits
       var toD = v3(dragon.position.x - gabe.position.x, 0, dragon.position.z - gabe.position.z).normalize();
-      var want = gabe.position.clone().addScaledVector(toD, -6).add(v3(0, 2.6, 0)).addScaledVector(v3(toD.z, 0, -toD.x), -0.9);
+      var want = gabe.position.clone().addScaledVector(toD, -7.5).add(v3(0, 2.4, 0));
       if (!camPos) camPos = want.clone(); camPos.lerp(want, Math.min(1, dt * 5));
       camera.position.copy(camPos);
       if (st.shake > 0) camera.position.add(v3((Math.random() - .5) * st.shake, (Math.random() - .5) * st.shake, 0));
-      var lookAt = gabe.position.clone().add(v3(0, 1.6, 0)).lerp(dragon.position, 0.22);
-      lookAt.y = Math.min(lookAt.y, gabe.position.y + 3.4); // keep Gabe on screen when the dragon is close
+      var lookAt = gabe.position.clone().add(v3(0, 2.2, 0)).lerp(dragon.position, 0.2);
+      lookAt.y = Math.min(lookAt.y, gabe.position.y + 6); // keep Gabe in frame while the dragon flies high
       camera.lookAt(lookAt);
       renderer.render(scene, camera);
       raf = requestAnimationFrame(frame);
