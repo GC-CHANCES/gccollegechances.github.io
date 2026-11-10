@@ -189,6 +189,29 @@ input[type="range"] { width: 100%; accent-color: var(--blue); }
 .callout { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 10px; background: var(--soft); font-size: 15px; }
 .callout b.big { font-family: var(--font-head); font-size: 38px; font-weight: 800; line-height: 1; color: var(--ink); }
 
+/* Secret button + lock screen */
+.steps a.secretbtn {
+  margin-top: 10px; justify-content: center; font-family: var(--font-head); font-weight: 800; font-size: 19px; letter-spacing: .06em; text-transform: uppercase;
+  color: #1b2238; background: linear-gradient(135deg, #fff3a0, #fcdb04 45%, #e0a800); border: 2px solid #fff6c2;
+  box-shadow: 0 0 0 0 rgba(252,219,4,.7), 0 4px 14px rgba(0,0,0,.25);
+  animation: secretPulse 2s ease-in-out infinite;
+}
+.steps a.secretbtn:hover { background: linear-gradient(135deg, #fff8c4, #ffe23a 45%, #f0b800); }
+.steps a.secretbtn[aria-current="page"] { background: linear-gradient(135deg, #fff3a0, #fcdb04 45%, #e0a800); box-shadow: inset 0 0 0 2px #fff; }
+.secretbtn .lock { font-size: 16px; }
+@keyframes secretPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(252,219,4,.65), 0 4px 14px rgba(0,0,0,.25); } 50% { box-shadow: 0 0 0 9px rgba(252,219,4,0), 0 4px 14px rgba(0,0,0,.25); } }
+@media (prefers-reduced-motion: reduce) { .steps a.secretbtn { animation: none; } }
+@media (max-width: 900px) { .steps a.secretbtn { margin-top: 0; font-size: 15px; padding: 6px 12px; } }
+.lockscreen { max-width: 440px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 34px 28px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.lockscreen[hidden] { display: none !important; }
+.lockicon { font-size: 46px; line-height: 1; }
+.lockscreen h2 { font-size: 30px; font-weight: 800; text-transform: uppercase; }
+.lockscreen p { margin: 0; }
+.lockrow { display: flex; gap: 8px; width: 100%; }
+.lockrow input { flex: 1; min-width: 0; font: inherit; font-size: 18px; letter-spacing: .2em; text-transform: uppercase; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); text-align: center; }
+.lockmsg { min-height: 1.2em; font-size: 14px; color: var(--far); font-weight: 600; }
+.lockscreen.shake { animation: lockShake .35s; }
+@keyframes lockShake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
 /* Major search */
 .majorbox { gap: 8px; }
 .picked { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 15px; }
@@ -385,14 +408,6 @@ button.crow:hover { background: var(--soft); }
 .dact button { width: 66px; height: 44px; font-size: 14px; }
 .dact .kick { width: 80px; height: 80px; border-radius: 50%; background: rgba(252,219,4,.85); color: #1b2238; font-size: 19px; }
 @media (hover: none), (max-width: 700px) { .dpad { display: flex; } }
-.codeform { display: flex; flex-direction: column; gap: 6px; }
-.codeform div { display: flex; gap: 6px; }
-.codeform input { flex: 1; min-width: 0; font: inherit; font-size: 14px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; text-transform: uppercase; }
-.codeform button { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff; cursor: pointer; }
-.codeform.big input { font-size: 17px; padding: 10px 12px; border-color: var(--line); background: var(--bg); color: var(--ink); }
-.codeform.big button { font-size: 15px; padding: 10px 18px; color: #fff; }
-.codemsg { font-size: 12.5px; min-height: 1em; }
-.codeform.big .codemsg { color: var(--muted); }
 .photo-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; align-items: start; }
 .guide ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
@@ -448,11 +463,10 @@ table.t tr:last-child td { border-bottom: 0; }
       <a class="go" href="#chances" data-nav="chances">Your chances <small id="goCount"></small></a>
       <nav class="steps" aria-label="Reference">
         <a href="#guide" data-nav="guide"><span class="tick" style="visibility:hidden"></span>GC guide</a>
-        <a href="#secret" data-nav="secret" id="secretNav" hidden><span class="tick" style="visibility:hidden"></span>Secret</a>
+        <a href="#secret" data-nav="secret" id="secretNav" class="secretbtn"><span class="lock" aria-hidden="true">🔒</span>Secret</a>
       </nav>
     </div>
     <div class="side-foot">
-      <form class="codeform" data-codeform autocomplete="off"><label for="codeSide">Have a code?</label><div><input id="codeSide" type="text" spellcheck="false" autocapitalize="characters"><button type="submit">Go</button></div><span class="codemsg" aria-live="polite"></span></form>
       <span>Made for students, not an official Greenfield-Central site. Your answers stay in this browser.</span>
       <button type="button" id="reset">Start over with a blank profile</button>
     </div>
@@ -599,9 +613,17 @@ table.t tr:last-child td { border-bottom: 0; }
     <section class="view" data-view="secret" aria-labelledby="h1-secret" hidden>
       <header class="vhead">
         <span class="stepno">Secret · Gabe's idea</span>
-        <h1 id="h1-secret">Gabe vs. the Dragon</h1>
-        <p>Senior night. Gabe, #99 and 18, is the last Cougar on the field when a rival dragon drops out of the sky. He's got a bag of soccer balls and his Paul N shield. Bring it down and keep the bell.</p>
+        <h1 id="h1-secret">Secret</h1>
+        <p id="secretBlurb" hidden>Senior night. Gabe, #99 and 18, is the last Cougar on the field when a rival dragon drops out of the sky. He's got a bag of soccer balls and his Paul N shield. Bring it down and keep the bell.</p>
       </header>
+      <form class="lockscreen" id="secretLock" autocomplete="off">
+        <div class="lockicon" aria-hidden="true">🔒</div>
+        <h2>Enter the code</h2>
+        <p class="muted">This tab is locked. Type the secret code to play.</p>
+        <div class="lockrow"><input id="secretCode" type="password" spellcheck="false" autocapitalize="characters" aria-label="Secret code" placeholder="Code"><button type="submit" class="btn primary">Unlock</button></div>
+        <span class="lockmsg" id="secretMsg" aria-live="polite"></span>
+      </form>
+      <div id="secretGame" hidden>
       <div class="dwrap" id="dragonWrap">
         <div class="dflash" id="dFlash"></div>
         <div class="dhud">
@@ -617,6 +639,7 @@ table.t tr:last-child td { border-bottom: 0; }
         </div>
       </div>
       <p class="muted small" style="margin:0"><b>Move:</b> W A S D or arrow keys. <b>Kick:</b> Space, K, or click. <b>Shield:</b> hold E, Q, or right-click. <b>Jump:</b> Shift or J. On a phone, use the buttons. The shield blocks attacks from the front, slows you down, and breaks if it runs out of energy.</p>
+      </div>
     </section>
 
     <!-- GUIDE -->
@@ -673,10 +696,6 @@ table.t tr:last-child td { border-bottom: 0; }
             <li><span class="w">Apr 15</span><span>Indiana FAFSA deadline for state aid and 21st Century Scholars.</span></li>
           </ol>
         </div>
-      </div>
-      <div class="panel" style="max-width:420px">
-        <h2>Have a code?</h2>
-        <form class="codeform big" data-codeform autocomplete="off"><label for="codeGuide" class="muted small">Enter it here.</label><div><input id="codeGuide" type="text" spellcheck="false" autocapitalize="characters"><button type="submit" class="btn primary">Unlock</button></div><span class="codemsg" aria-live="polite"></span></form>
       </div>
       <p class="fine">Sources: <a href="https://gchs.gcsc.k12.in.us/wp-content/uploads/2026/02/Curriculum-Guide-2026-27-1.pdf" target="_blank" rel="noopener">G-CHS 2026–27 Course of Study</a>, <a href="https://gchs.gcsc.k12.in.us/wp-content/uploads/2025/05/Extracurricular-Activities-and-Interests.pdf" target="_blank" rel="noopener">G-CHS activities list</a>, <a href="https://gchs.gcsc.k12.in.us/wp-content/uploads/2025/06/Diploma-Comparison-12.11.24.pdf" target="_blank" rel="noopener">G-CHS diploma comparison</a>, <a href="https://learnmoreindiana.org/preadmit/" target="_blank" rel="noopener">Indiana Pre-Admissions</a>, and the <a href="https://www.admissions.purdue.edu/become-student/class-profile" target="_blank" rel="noopener">Purdue</a> and <a href="https://bloomington.iu.edu/admissions/class-profile.html" target="_blank" rel="noopener">IU</a> class profiles. College admit rates and SAT ranges come from each college's fall 2025 Common Data Set or class profile where available (Purdue, IU, Butler, Indiana State, USI, Valparaiso), and otherwise from the U.S. Department of Education's <a href="https://nces.ed.gov/ipeds/" target="_blank" rel="noopener">IPEDS</a> admissions survey for fall 2023, the newest posted. GPA ranges marked estimated are estimates because most colleges don't publish a GPA range. Each college's exact source is listed when you open it. Not made or endorsed by Greenfield-Central Community Schools or any college.</p>
     </section>
@@ -1535,21 +1554,24 @@ table.t tr:last-child td { border-bottom: 0; }
   }
 
 
-  /* ---------- Secret code ---------- */
-  var SECRET_KEY = "gc-secret-unlocked", unlocked = false;
-  try { unlocked = localStorage.getItem(SECRET_KEY) === "1"; } catch (e) {}
-  function showSecretNav() { $("secretNav").hidden = !unlocked; }
-  showSecretNav();
-  document.querySelectorAll("[data-codeform]").forEach(function (f) {
-    f.addEventListener("submit", function (ev) {
-      ev.preventDefault();
-      var inp = f.querySelector("input"), msg = f.querySelector(".codemsg");
-      if ((inp.value || "").trim().toUpperCase() === "STEVE") {
-        unlocked = true; try { localStorage.setItem(SECRET_KEY, "1"); } catch (e) {}
-        showSecretNav(); inp.value = ""; msg.textContent = "Unlocked.";
-        if (location.hash === "#secret") route(); else location.hash = "#secret";
-      } else { msg.textContent = "That code doesn't work."; }
-    });
+  /* ---------- Secret code: asked every time you open the Secret tab ---------- */
+  var unlocked = false;
+  try { localStorage.removeItem("gc-secret-unlocked"); } catch (e) {} // older versions remembered the code; now it's asked each visit
+  function showSecret(open) {
+    $("secretLock").hidden = open; $("secretGame").hidden = !open; $("secretBlurb").hidden = !open;
+    $("h1-secret").textContent = open ? "Gabe vs. the Dragon" : "Secret";
+  }
+  $("secretLock").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var inp = $("secretCode"), lock = $("secretLock");
+    if ((inp.value || "").trim().toUpperCase() === "STEVE") {
+      unlocked = true; inp.value = ""; $("secretMsg").textContent = "";
+      showSecret(true); DRAGON.show();
+    } else {
+      $("secretMsg").textContent = "Wrong code. Try again.";
+      lock.classList.remove("shake"); void lock.offsetWidth; lock.classList.add("shake");
+      inp.select();
+    }
   });
 
   /* ---------- Secret game: Gabe vs. the Dragon (original 3D boss fight, three.js r128) ---------- */
@@ -2151,8 +2173,10 @@ table.t tr:last-child td { border-bottom: 0; }
     if (VIEWS.indexOf(v) < 0) v = "courses";
     if (v === "sports" || v === "about" || v === "seal") { S.seen[v] = true; save(); }
     if (v !== "chances" && ui.open) closeCollege();
-    if (v === "secret" && !unlocked) { v = "guide"; }
-    if (v === "secret") DRAGON.show(); else DRAGON.hide();
+    if (v !== "secret") unlocked = false;          // leaving the tab locks it again
+    showSecret(v === "secret" && unlocked);
+    if (v === "secret" && unlocked) DRAGON.show(); else DRAGON.hide();
+    if (v === "secret" && !unlocked) setTimeout(function () { $("secretMsg").textContent = ""; $("secretCode").value = ""; try { $("secretCode").focus({ preventScroll: true }); } catch (e) {} }, 0);
     document.querySelectorAll("[data-view]").forEach(function (s) { s.hidden = s.dataset.view !== v; });
     document.querySelectorAll("[data-nav]").forEach(function (a) { if (a.dataset.nav === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     var a = document.querySelector('[data-nav="' + v + '"]');
