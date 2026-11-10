@@ -269,6 +269,61 @@ details.col > summary:hover { background: var(--soft); }
 .empty { padding: 24px; text-align: center; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
 
 /* ---------- Guide ---------- */
+/* College list rows (tap to open) */
+.ctools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.ctools input[type="search"] { width: auto; flex: 1 1 200px; min-width: 0; }
+.ctools select { width: auto; font-size: 14.5px; padding: 7px 10px; }
+.filter { flex-wrap: wrap; }
+button.crow { display: grid; grid-template-columns: minmax(0,1fr) 150px 92px; gap: 16px; align-items: center; width: 100%; text-align: left; padding: 14px 18px; border: 0; border-bottom: 1px solid var(--line); background: transparent; cursor: pointer; }
+button.crow:last-child { border-bottom: 0; }
+button.crow:hover { background: var(--soft); }
+@media (max-width: 560px) { button.crow { grid-template-columns: minmax(0,1fr) 84px; padding: 12px 14px; } }
+.crow .cn { display: flex; align-items: center; gap: 6px; }
+.crow .savedmark { color: var(--gold-ink, #b38f00); font-size: 15px; }
+.chip2 { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 99px; margin-left: 6px; vertical-align: 1px; }
+.chip2.down { background: color-mix(in srgb, var(--far) 14%, transparent); color: var(--far); }
+.chip2.up { background: color-mix(in srgb, var(--likely) 14%, transparent); color: var(--likely); }
+
+/* College panel */
+.scrim { position: fixed; inset: 0; background: rgba(8,16,32,.45); z-index: 40; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 50; width: min(560px, 100%);
+  background: var(--bg); color: var(--ink); overflow-y: auto; box-shadow: -12px 0 40px rgba(0,0,0,.25);
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) max(20px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 28px) 20px;
+  display: flex; flex-direction: column; gap: 18px;
+}
+@media (max-width: 600px) { .drawer { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); } }
+.dh { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.dh h2 { font-size: 30px; font-weight: 800; text-transform: uppercase; }
+.iconbtn { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 22px; line-height: 1; }
+.dchance { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.dchance .pct { font-size: 56px; text-align: left; }
+.dchance .pct.word { font-size: 30px; }
+.dchance .lbl { flex: 1 1 140px; }
+.dchance .lbl b { font-family: var(--font-head); font-size: 24px; text-transform: uppercase; display: block; line-height: 1; }
+.star { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 600; font-size: 14.5px; }
+.star[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: #1b2238; }
+.dsec { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.dsec h3 { font-size: 20px; font-weight: 700; text-transform: uppercase; }
+.fx { display: grid; grid-template-columns: minmax(0,1fr) 120px 64px; gap: 10px; align-items: center; font-size: 14.5px; }
+@media (max-width: 420px) { .fx { grid-template-columns: minmax(0,1fr) 84px 56px; } }
+.fxbar { position: relative; height: 10px; background: var(--line); border-radius: 5px; }
+.fxbar::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; background: var(--muted); opacity: .5; }
+.fxbar i { position: absolute; top: 0; bottom: 0; border-radius: 5px; }
+.fxbar i.pos { left: 50%; background: var(--likely); }
+.fxbar i.neg { right: 50%; background: var(--far); }
+.fx .v { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fx .v.pos { color: var(--likely); } .fx .v.neg { color: var(--far); }
+.wi { display: flex; flex-direction: column; gap: 4px; }
+.wi .wl { display: flex; justify-content: space-between; font-size: 14.5px; font-weight: 600; }
+.wi .wl span { font-variant-numeric: tabular-nums; }
+.wires { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 12px 14px; border-radius: 10px; background: var(--soft); }
+.wires b { font-family: var(--font-head); font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.facts2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px 16px; margin: 0; }
+.facts2 div { display: flex; flex-direction: column; }
+.facts2 dt { font-size: 13px; color: var(--muted); }
+.facts2 dd { margin: 0; font-weight: 600; }
+
 .guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; align-items: start; }
 .guide ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
 .guide li b { color: var(--ink); }
@@ -375,7 +430,7 @@ table.t tr:last-child td { border-bottom: 0; }
       <header class="vhead">
         <span class="stepno">Step 4 of 6</span>
         <h1 id="h1-grades">GPA &amp; SAT</h1>
-        <p>Use the weighted GPA from PowerSchool. Every GC junior takes the SAT at school in the spring, and that score counts for college applications.</p>
+        <p>Enter the weighted GPA from PowerSchool. It counts directly toward your chances, and so do the AP and ACP classes behind it. Every GC junior takes the SAT at school in the spring, and that score counts for college applications.</p>
       </header>
       <div class="panel">
         <h2>GPA</h2>
@@ -400,13 +455,18 @@ table.t tr:last-child td { border-bottom: 0; }
       <header class="vhead">
         <span class="stepno">Step 5 of 6</span>
         <h1 id="h1-about">About you</h1>
-        <p>The rest of your application: what you want to study, your work and service, and how strong your essays and recommendations are.</p>
+        <p>The rest of your application: what you want to study, whether you volunteer, and how strong your essays and recommendations are. Your major changes your odds at many colleges.</p>
       </header>
       <div class="panel">
         <div class="fields">
           <div class="field"><label for="classOf">Graduating class</label><select id="classOf"><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select></div>
-          <div class="field"><label for="jobHrs">Job, hours per week</label><input type="number" id="jobHrs" min="0" max="40" step="1"></div>
-          <div class="field"><label for="volHrs">Volunteer hours, total</label><input type="number" id="volHrs" min="0" max="2000" step="5"></div>
+          <div class="field"><label for="volunteer">Do you volunteer your time regularly?</label>
+            <select id="volunteer">
+              <option value="no">No</option>
+              <option value="sometimes">Sometimes, a few times a year</option>
+              <option value="monthly">Yes, about once a month</option>
+              <option value="weekly">Yes, every week</option>
+            </select></div>
         </div>
         <div class="field majorbox">
           <label for="majorSearch">What you want to study</label>
@@ -444,13 +504,23 @@ table.t tr:last-child td { border-bottom: 0; }
         <p class="basis" id="basis"></p>
       </header>
       <div class="mix"><div class="mixbar" id="mixbar"></div><div class="legend" id="legend"></div></div>
-      <div class="filter" role="group" aria-label="Which colleges">
-        <button type="button" data-region="all" aria-pressed="true">All 30</button>
-        <button type="button" data-region="in" aria-pressed="false">Indiana</button>
-        <button type="button" data-region="out" aria-pressed="false">Out of state</button>
+      <div class="ctools">
+        <input type="search" id="cSearch" placeholder="Search colleges" autocomplete="off" aria-label="Search colleges">
+        <div class="filter" role="group" aria-label="Which colleges">
+          <button type="button" data-region="all" aria-pressed="true">All 30</button>
+          <button type="button" data-region="in" aria-pressed="false">Indiana</button>
+          <button type="button" data-region="out" aria-pressed="false">Out of state</button>
+          <button type="button" data-region="saved" aria-pressed="false" id="savedBtn">My list</button>
+        </div>
+        <select id="cSort" aria-label="Sort colleges">
+          <option value="chance">Best chance first</option>
+          <option value="mi">Closest to Greenfield</option>
+          <option value="name">A to Z</option>
+        </select>
       </div>
+      <p class="muted small" style="margin:0">Tap a college to see what's moving your odds, try different numbers, and save it to your list.</p>
       <div id="tiers" class="stack"></div>
-      <p class="fine">Estimates, not decisions. Each college starts from its admit rate, then your GPA and SAT move the odds by where you fall in its middle-50% range. Courses, activities, sports, and essays count more at selective schools. Tap a college to see its numbers.</p>
+      <p class="fine">Estimates, not decisions. Each college starts from its admit rate. Your weighted GPA and SAT move the odds by where you fall in its middle-50% range, and your courses, activities, sports, volunteering, essays, and major move them further. Major effects are estimates, because most colleges don't publish admit rates by major.</p>
     </section>
 
     <!-- GUIDE -->
@@ -512,6 +582,9 @@ table.t tr:last-child td { border-bottom: 0; }
     </section>
   </main>
 </div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dName" hidden></aside>
 
 <script>
 (function () {
@@ -689,27 +762,27 @@ table.t tr:last-child td { border-bottom: 0; }
   var ESSAY = ["", "Weak", "Below average", "Solid", "Strong", "Exceptional"];
 
   /* ---------- State, saved only in this browser ---------- */
-  var KEY = "gc-college-chances-v4";
+  var KEY = "gc-college-chances-v5";
   var EXAMPLE = {
     example: true,
     courses: { "ap-lang": 1, "ap-ush": 1, "acp-precalc": 1, "h-chem": 1, "pltw-ied": 1 },
     acts: { "Cougar Pride Marching Band": { lead: false }, "National Honor Society": { lead: false } },
     sports: { "Cross Country": { lead: true } },
-    form: { wgpa: "3.75", testType: "sat", score: "1210", submitTest: true, classOf: "2028", major: "Undecided", jobHrs: "8", volHrs: "20", essay: "3", firstgen: false },
+    form: { wgpa: "3.75", testType: "sat", score: "1210", submitTest: true, classOf: "2028", major: "Undecided", volunteer: "monthly", essay: "3", firstgen: false },
     seal: { allC: true, math8: true, sci6: true, wlss: true, wl6: false, arts2: true, skills: true, credential: false, wbl: false, newDiploma: false },
     seen: {}
   };
   var BLANK = { example: false, courses: {}, acts: {}, sports: {},
-    form: { wgpa: "", testType: "sat", score: "", submitTest: true, classOf: "2028", major: "Undecided", jobHrs: "0", volHrs: "0", essay: "3", firstgen: false },
+    form: { wgpa: "", testType: "sat", score: "", submitTest: true, classOf: "2028", major: "Undecided", volunteer: "no", essay: "3", firstgen: false },
     seal: {}, seen: {} };
   function copy(o) { return JSON.parse(JSON.stringify(o)); }
   var S;
   try { S = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { S = null; }
   if (!S || !S.form) S = copy(EXAMPLE);
-  ["courses", "acts", "sports", "seal", "seen"].forEach(function (k) { S[k] = S[k] || {}; });
+  ["courses", "acts", "sports", "seal", "seen", "saved"].forEach(function (k) { S[k] = S[k] || {}; });
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
 
-  var FORM = ["wgpa", "testType", "score", "classOf", "jobHrs", "volHrs", "essay"];
+  var FORM = ["wgpa", "testType", "score", "classOf", "volunteer", "essay"];
   function loadForm() {
     FORM.forEach(function (id) { $(id).value = S.form[id] != null ? S.form[id] : ""; });
     $("submitTest").checked = !!S.form.submitTest; $("firstgen").checked = !!S.form.firstgen;
@@ -733,15 +806,12 @@ table.t tr:last-child td { border-bottom: 0; }
       cs[c.kind]++; cs.rigor += c.rig; if (c.w) cs.weighted++;
       var cr = collegeCredits(c); if (cr) { cs.college++; cs.credits += cr; }
     });
-    // Unweighted estimate: GC's eight-block schedule gives about 64 semester grades in four years, and each weighted
-    // year-long course adds 0.5 to two of them. Most colleges compare an unweighted 4.0-scale GPA.
-    var gpa = w == null ? null : clamp(w - 0.5 * Math.min(64, cs.weighted * 2) / 64, 0, 4);
+    var gpa = w; // the PowerSchool weighted GPA is what counts
     var as = { clubs: 0, honors: 0, sports: 0, lead: 0, captains: 0, pts: 0 };
     Object.keys(S.acts).forEach(function (n) { if (!ISACT[n]) return; as.clubs++; if (HONOR[n]) as.honors++; as.pts += 1; if (S.acts[n].lead) { as.lead++; as.pts += 1.5; } });
     Object.keys(S.sports).forEach(function (n) { if (!ISSPORT[n]) return; as.sports++; as.pts += 1.25; if (S.sports[n].lead) { as.captains++; as.pts += 1.5; } });
-    var job = num(f.jobHrs) || 0, vol = num(f.volHrs) || 0;
-    if (job >= 10) as.pts += 1.5; else if (job >= 4) as.pts += 0.75;
-    if (vol >= 100) as.pts += 1.25; else if (vol >= 40) as.pts += 0.6;
+    var VOL_PTS = { no: 0, sometimes: 0.5, monthly: 1.25, weekly: 2 };
+    as.pts += VOL_PTS[f.volunteer] || 0;
     as.level = as.pts < 1 ? 1 : as.pts < 3 ? 2 : as.pts < 6 ? 3 : as.pts < 9 ? 4 : 5;
     var classOf = +f.classOf;
     // Diploma path: the new Indiana Diploma is required starting with the Class of 2029; 2027 and 2028 stay on Core 40 unless the school moves them.
@@ -755,11 +825,11 @@ table.t tr:last-child td { border-bottom: 0; }
       test: path === "new" ? !!((sat && sat >= 1250) || (act && act >= 26)) : !!((f.testType === "sat" && sat >= 1250) || (act && act >= 26))
     };
     var anyOpt = opt.ap4 || opt.col6 || opt.twoOf || opt.test;
-    var sl = S.seal, b, base, pl = null, plus = false, wblHours = job * 36;
+    var sl = S.seal, b, base, pl = null, plus = false;
     if (path === "new") {
       b = { gpa: gpa != null && gpa >= 3.0, allC: !!sl.allC, wlss: !!sl.wlss, math8: !!sl.math8, sci6: !!sl.sci6, opt: anyOpt };
       base = b.gpa && b.allC && b.wlss && b.math8 && b.sci6 && b.opt;
-      pl = { cred: !!sl.credential, wbl: wblHours >= 75 || !!sl.wbl, skills: !!sl.skills };
+      pl = { cred: !!sl.credential, wbl: !!sl.wbl, skills: !!sl.skills };
       plus = base && pl.cred && pl.wbl && pl.skills;
     } else {
       b = { gpa: gpa != null && gpa >= 3.0, allC: !!sl.allC, math8: !!sl.math8, wl6: !!sl.wl6, arts2: !!sl.arts2, opt: anyOpt };
@@ -767,49 +837,106 @@ table.t tr:last-child td { border-bottom: 0; }
     }
     var majorName = MAJOR_CAT[f.major] ? f.major : "Undecided";
     return { gpa: gpa, wgpa: w, sat: sat, raw: raw, testType: f.testType, send: !!f.submitTest, major: majorName, mcat: MAJOR_CAT[majorName], classOf: classOf,
-      essay: +f.essay || 3, fg: !!f.firstgen, job: job, vol: vol, cs: cs, as: as,
-      seal: { path: path, opt: opt, b: b, base: base, p: pl, plus: plus, wblHours: wblHours } };
+      essay: +f.essay || 3, fg: !!f.firstgen, volunteer: f.volunteer || "no", cs: cs, as: as,
+      seal: { path: path, opt: opt, b: b, base: base, p: pl, plus: plus } };
   }
 
   /* ---------- Chance model ---------- */
   function logit(p) { return Math.log(p / (1 - p)); }
   function sig(x) { return 1 / (1 + Math.exp(-x)); }
-  function estimate(c, p) {
-    var out = { notes: [], warn: [] };
+  // How a major changes admission at each college. Colleges rarely publish admit rates by major, so apart from
+  // Purdue engineering (real numbers) these are estimates based on which programs are known to be limited or
+  // more competitive than the college overall.
+  var BIG = { pur: 1, uiuc: 1, um: 1, osu: 1, iub: 1 };
+  function majorEffect(c, p) {
+    var m = p.mcat, id = c.id, R = c.rate / 100;
+    if (m === "general") return { v: 0, text: "" };
+    if (c.stem && !STEM_CATS[m]) return { na: true, text: "Rose-Hulman only offers engineering, science, and math majors." };
+    if (m === "nursing" && (id === "nd" || id === "rose")) return { na: true, text: c.name + " doesn't offer a nursing major." };
+    if (c.open) return { v: 0, text: (m === "nursing" || m === "health") ? "Admission is open, but programs like " + p.major + " have their own limited-space application." : "" };
+    switch (m) {
+      case "nursing": return { v: R < 0.9 ? -0.6 : -0.35, text: "Nursing has limited spots, so it's harder to get into than the college overall." };
+      case "cs":
+        if (id === "uiuc") return { v: -0.9, text: "Illinois computer science admits a much smaller share than the university overall." };
+        if (BIG[id]) return { v: -0.6, text: p.major + " is one of the most competitive majors here." };
+        if (id === "rose") return { v: 0, text: "" };
+        return { v: -0.15, text: p.major + " is a popular major, so it's a little more competitive." };
+      case "eng":
+        if (id === "pur") return { v: 0, text: "Your chance uses Purdue's College of Engineering numbers (34.7% admitted)." };
+        if (id === "uiuc") return { v: -0.6, text: "Illinois engineering admits a smaller share than the university overall." };
+        if (id === "um" || id === "osu") return { v: -0.3, text: "Engineering is more competitive here than the university overall." };
+        if (id === "rose") return { v: 0, text: "" };
+        return { v: -0.1, text: "Engineering is a little more competitive than most majors." };
+      case "it": return BIG[id] ? { v: -0.2, text: "Computing majors are competitive here." } : { v: 0, text: "" };
+      case "bus":
+        if (id === "um") return { v: -0.4, text: "Michigan's Ross School of Business is more selective than the university overall." };
+        if (id === "iub") return { v: -0.2, text: "Direct admission to IU's Kelley School of Business has higher standards than IU overall." };
+        if (id === "pur" || id === "osu") return { v: -0.2, text: "Business is one of the more competitive majors here." };
+        return { v: 0, text: "" };
+      case "pharm":
+        if (id === "pur" || id === "butler") return { v: -0.35, text: "Pharmacy is a limited-space program here." };
+        return { v: -0.1, text: "Pharmacy programs usually have limited space." };
+      case "health": return R < 0.9 ? { v: -0.15, text: p.major + " programs often have limited space." } : { v: 0, text: "" };
+      case "arts": return { v: 0, text: /Music|Dance|Theater/.test(p.major) ? "Performance majors usually need an audition or portfolio." : "" };
+      default:
+        if (id === "pur" || id === "uiuc") return { v: 0.15, text: p.major + " is less crowded here than engineering and computer science." };
+        return { v: 0, text: "" };
+    }
+  }
+
+  function finalize(x, R) {
+    var pr = sig(x);
+    if (R < 0.2) pr = Math.min(pr, Math.min(0.6, R * 4)); // no one is a sure thing at very selective colleges
+    return clamp(pr, 0.01, 0.97);
+  }
+
+  // ov lets the college panel try other numbers: { gpa, sat }.
+  function estimate(c, p, ov) {
+    ov = ov || {};
+    var out = { notes: [], warn: [], parts: [] };
+    var me = majorEffect(c, p);
+    out.major = me;
+    if (me.na) { out.p = 0; out.kind = "na"; return out; }
     if (c.open) { out.p = 1; out.kind = "open"; return out; }
-    if (p.seal.plus && c.res) { out.p = 1; out.kind = "seal"; return out; }
+    if (p.seal.plus && c.res && ov.gpa == null && ov.sat == null) { out.p = 1; out.kind = "seal"; return out; }
     var rate = c.rate, g = c.g, s = c.s;
-    if (p.mcat === "eng" && c.eng) { rate = c.eng.rate; g = c.eng.g; s = c.eng.s; out.notes.push("Using College of Engineering numbers for " + p.major + "."); }
+    if (p.mcat === "eng" && c.eng) { rate = c.eng.rate; g = c.eng.g; s = c.eng.s; }
     var R = rate / 100;
     // A student at the admitted-student middle is stronger than the average applicant, so start a bit above the raw admit rate.
     var L = logit(clamp(R, 0.01, 0.99)) + 0.5;
-    var myG = c.gs === "w" ? p.wgpa : p.gpa;
+    var myG = ov.gpa != null ? ov.gpa : p.wgpa;
+    var mySat = ov.sat != null ? ov.sat : p.sat;
     var gMid = (g[0] + g[1]) / 2, gSD = Math.max(0.3, (g[1] - g[0]) / 1.35);
     // Broad-access colleges (85%+) admit most students with a C+ average or better, so being below their range hurts less.
     var zG = clamp((myG - gMid) / gSD, R >= 0.85 ? -1.5 : -3, 2);
-    var useSat = !!(s && p.sat && (c.test === "req" || p.send)), zS = 0;
-    if (useSat) { var sMid = (s[0] + s[1]) / 2, sSD = Math.max(80, (s[1] - s[0]) / 1.35); zS = clamp((p.sat - sMid) / sSD, -3, 2); }
-    var acad = useSat ? 0.62 * zG + 0.38 * zS : zG;
-    if (!useSat && s && R < 0.5) acad -= 0.15;
-    if (c.test === "req" && !p.sat) out.warn.push("Purdue requires an SAT or ACT score.");
+    var useSat = !!(s && mySat && (c.test === "req" || p.send || ov.sat != null)), zS = 0;
+    if (useSat) { var sMid = (s[0] + s[1]) / 2, sSD = Math.max(80, (s[1] - s[0]) / 1.35); zS = clamp((mySat - sMid) / sSD, -3, 2); }
+    if (c.test === "req" && !mySat) out.warn.push("Purdue requires an SAT or ACT score.");
     var sel = R < 0.3 ? 2 : R < 0.7 ? 1 : 0;
-    var rigor = clamp((p.cs.rigor - [2, 4, 8][sel]) * 0.07, -0.45, 0.3);
     var hw = [0.05, 0.14, 0.28][sel];
-    var holistic = (p.as.level - 3) * hw + (p.essay - 3) * hw * 0.8;
-    var fg = p.fg ? [0.05, 0.1, 0.15][sel] : 0;
-    var inState = (c.id === "iub" || c.id === "pur") ? 0.25 : 0;
-    var pr = sig(L + 1.1 * acad + rigor + holistic + fg + inState);
-    if (R < 0.2) pr = Math.min(pr, Math.min(0.6, R * 4));
-    pr = clamp(pr, 0.01, 0.97);
-    if (c.stem && !STEM_CATS[p.mcat] && p.mcat !== "general") out.warn.push("Rose-Hulman only offers engineering, science, and math majors.");
+    var VOLW = { no: 0, sometimes: 0, monthly: 0.5, weekly: 1 };
+    var parts = [
+      ["Your weighted GPA", 1.1 * (useSat ? 0.62 : 1) * zG],
+      [useSat ? "Your SAT" : "No test score sent", useSat ? 1.1 * 0.38 * zS : (s && R < 0.5 ? -0.15 : 0)],
+      ["Your AP, ACP, and other courses", clamp((p.cs.rigor - [2, 4, 8][sel]) * 0.07, -0.45, 0.3)],
+      ["Activities and sports", (p.as.level - 3) * hw],
+      ["Volunteering", (VOLW[p.volunteer] || 0) * hw * 0.6],
+      ["Essays and recommendations", (p.essay - 3) * hw * 0.8],
+      ["First in your family", p.fg ? [0.05, 0.1, 0.15][sel] : 0],
+      ["Indiana resident", (c.id === "iub" || c.id === "pur") ? 0.25 : 0],
+      ["Your major", me.v || 0]
+    ];
+    var x = L;
+    parts.forEach(function (q) { x += q[1]; });
+    out.p = finalize(x, R);
+    out.base = finalize(L, R);
+    out.parts = parts.filter(function (q) { return Math.abs(q[1]) > 0.001; }).map(function (q) {
+      return { k: q[0], pts: out.p - finalize(x - q[1], R) };
+    });
     if (c.id === "pur" && p.mcat === "eng" && p.cs.pltw) out.notes.push("Your PLTW courses show engineering interest.");
-    if ((c.id === "pur" || c.id === "uiuc") && p.mcat === "cs") out.warn.push(p.major + " here admits a smaller share than the overall rate, so this estimate is likely high.");
-    if (c.id === "uiuc" && p.mcat === "eng") out.warn.push("Engineering here admits a smaller share than the overall rate, so this estimate is likely high.");
-    if (c.id === "uc" && (p.mcat === "nursing" || p.mcat === "eng" || p.mcat === "arts")) out.warn.push("This program is more selective at UC than the overall rate.");
-    if (c.id === "iub" && p.mcat === "pa") out.notes.push(p.gpa >= 3.5 && p.sat >= 1280 ? "You meet O'Neill direct-admission criteria (3.5 GPA, 1280 SAT)." : "O'Neill direct admission needs a 3.5 GPA and 1280 SAT (27 ACT).");
-    if (c.id === "iub" && p.mcat === "nursing") out.notes.push(p.gpa >= 3.8 ? "Your GPA meets the nursing direct-admit level (about 3.8)." : "Nursing direct admission needs about a 3.8 GPA.");
-    if (p.mcat === "nursing" && !c.open && c.id !== "iub" && c.id !== "uc") out.notes.push("Nursing is usually more competitive than a college's overall admit rate.");
-    out.p = pr; out.kind = "est"; out.used = { g: g, s: s, myG: myG, useSat: useSat };
+    if (c.id === "iub" && p.mcat === "pa") out.notes.push(p.wgpa >= 3.5 && p.sat >= 1280 ? "You meet O'Neill direct-admission criteria (3.5 GPA, 1280 SAT)." : "O'Neill direct admission needs a 3.5 GPA and 1280 SAT (27 ACT).");
+    if (c.id === "iub" && p.mcat === "nursing") out.notes.push(p.wgpa >= 3.8 ? "Your GPA meets the nursing direct-admit level (about 3.8)." : "Nursing direct admission needs about a 3.8 GPA.");
+    out.kind = "est"; out.used = { g: g, s: s, myG: myG, useSat: useSat, mySat: mySat, R: R };
     return out;
   }
   function tier(p) { return p >= 0.8 ? "likely" : p >= 0.45 ? "target" : p >= 0.15 ? "reach" : "far"; }
@@ -877,11 +1004,10 @@ table.t tr:last-child td { border-bottom: 0; }
     mineList("actMine", S.acts, "Officer or leader", "Check a club above, then mark it here if you lead it.");
     mineList("sportMine", S.sports, "Captain", "Check a team above, or skip this step.");
 
-    // GPA: weighted is entered; Latin Honors uses the PowerSchool GPA; colleges mostly compare unweighted.
     var lh = latin(p.wgpa);
     $("gpaCallout").innerHTML = p.wgpa == null ? '<span class="muted">Enter your weighted GPA from PowerSchool.</span>' :
-      '<b class="big">' + p.gpa.toFixed(2) + '</b><span>Estimated unweighted GPA, which most colleges compare. It removes GC\'s 0.5 boost from the ' + cs.weighted +
-      " weighted course" + (cs.weighted === 1 ? "" : "s") + " you checked in step 1. " + (lh ? "At " + p.wgpa.toFixed(2) + " you're on pace for <b>" + lh + "</b>." : "Cum Laude starts at 3.6.") + "</span>";
+      '<b class="big">' + p.wgpa.toFixed(2) + '</b><span>' + (lh ? "You're on pace to graduate <b>" + lh + "</b>." : "Cum Laude starts at 3.6.") +
+      " GC's Latin Honors use this same PowerSchool GPA: Summa Cum Laude 4.0+, Magna 3.8–3.9, Cum Laude 3.6–3.7.</span>";
     var tt = S.form.testType;
     $("score").disabled = tt === "none";
     $("score").min = tt === "act" ? 1 : 400; $("score").max = tt === "act" ? 36 : 1600; $("score").step = tt === "act" ? 1 : 10;
@@ -899,7 +1025,7 @@ table.t tr:last-child td { border-bottom: 0; }
       yn(o.test) + (isNew ? " SAT 1250 or ACT 26" : " SAT 1250 (with 560+ Math and 590+ Reading & Writing) or ACT 26 with writing");
     var proofYou = "From your profile: " + cs.ap + " AP class" + (cs.ap === 1 ? "" : "es") + ", about " + cs.credits + " college credits from " + cs.college +
       " dual-credit course" + (cs.college === 1 ? "" : "s") + ", " + (p.sat ? (p.testType === "act" ? "ACT " + Math.round(p.raw) : "SAT " + p.sat) : "no test score");
-    var gpaLine = p.gpa == null ? "Add your GPA in step 4" : "Your estimated unweighted GPA: " + p.gpa.toFixed(2);
+    var gpaLine = p.gpa == null ? "Add your GPA in step 4" : "Your GPA: " + p.gpa.toFixed(2);
     if (p.classOf >= 2029) {
       $("sealIntro").textContent = "Class of " + p.classOf + ": you graduate with the new Indiana Diploma. Its Enrollment Honors Plus seal guarantees admission at all seven Indiana public universities, including IU and Purdue, and several private colleges.";
       $("pathPick").innerHTML = "";
@@ -928,7 +1054,7 @@ table.t tr:last-child td { border-bottom: 0; }
       $("sealPlus").innerHTML =
         req(sl.base, "Earn the Enrollment Honors seal", "Everything in the first column.", "") +
         req(sl.p.cred, "Credential of value", "From the state's list, such as the Indiana College Core (30 college credits), AP Scholar with Distinction, an associate degree, or a technical certificate.", "", "credential") +
-        req(sl.p.wbl, "75 hours of work-based learning", "Paid, unpaid, on-site, or simulated work.", p.job ? "Your job adds about " + Math.round(sl.wblHours) + " hours a school year" : "", "wbl") +
+        req(sl.p.wbl, "75 hours of work-based learning", "Paid, unpaid, on-site, or simulated work. A job, an internship, or a work-based learning class counts.", "", "wbl") +
         req(sl.p.skills, "Communication, collaboration, and work ethic", "Shown through school-verified experiences.", "", "skills");
       $("sealSource").innerHTML = 'From Indiana\'s <a href="https://cdn.learnmoreindiana.org/wp-content/uploads/2026/06/Final-Diploma-Rule_202606.pdf" target="_blank" rel="noopener">final diploma rule (June 2026)</a>. Credits are high school credits: a year-long class is 2 credits. Confirm your plan with your counselor.';
     } else {
@@ -945,7 +1071,7 @@ table.t tr:last-child td { border-bottom: 0; }
 
     var rows = C.map(function (c) { return { c: c, e: estimate(c, p) }; });
     var n = { likely: 0, target: 0, reach: 0, far: 0 };
-    rows.forEach(function (r) { r.t = tier(r.e.p); n[r.t]++; });
+    rows.forEach(function (r) { r.t = r.e.kind === "na" ? "na" : tier(r.e.p); if (n[r.t] != null) n[r.t]++; });
     var ready = p.wgpa != null;
     $("goCount").textContent = ready ? n.likely + " likely" : "";
     $("mixbar").innerHTML = ready ? TIERS.map(function (t) { return n[t[0]] ? '<i class="bg-' + t[0] + '" style="width:' + (n[t[0]] / 30 * 100) + '%"></i>' : ""; }).join("") : "";
@@ -961,39 +1087,140 @@ table.t tr:last-child td { border-bottom: 0; }
     $("basis").innerHTML = "Based on " + bits.join(", ") + "." + (S.example ? ' <span class="warn">These are example numbers.</span> <a href="#courses">Enter yours</a>.' : "");
 
     var region = document.querySelector("[data-region][aria-pressed=true]").dataset.region;
-    var shown = rows.filter(function (r) { return region === "all" || r.c.st === region; });
+    var q = ($("cSearch").value || "").trim().toLowerCase();
+    var sortBy = $("cSort").value;
+    var savedN = Object.keys(S.saved).length;
+    $("savedBtn").textContent = "★ My list" + (savedN ? " (" + savedN + ")" : "");
+    var shown = rows.filter(function (r) {
+      if (region === "saved" && !S.saved[r.c.id]) return false;
+      if (region === "in" && r.c.st !== "in") return false;
+      if (region === "out" && r.c.st !== "out") return false;
+      return !q || r.c.name.toLowerCase().indexOf(q) >= 0 || r.c.city.toLowerCase().indexOf(q) >= 0;
+    });
+    function order(a, b) {
+      if (sortBy === "mi") return a.c.mi - b.c.mi;
+      if (sortBy === "name") return a.c.name.localeCompare(b.c.name);
+      return b.e.p - a.e.p || a.c.mi - b.c.mi;
+    }
+    var groups = TIERS.concat([["na", "Doesn't offer your major", ""]]);
+    var html = groups.map(function (t) {
+      var list = shown.filter(function (r) { return r.t === t[0]; }).sort(order);
+      if (!list.length) return "";
+      return '<div class="tier"><h2 class="c-' + t[0] + '">' + t[1] + " <small>" + (t[2] ? t[2] + " · " : "") + list.length + " college" + (list.length > 1 ? "s" : "") + '</small></h2><div class="rows">' +
+        list.map(function (r) { return collegeRow(r.c, r.e, t[0]); }).join("") + "</div></div>";
+    }).join("");
     $("tiers").innerHTML = !ready ? '<div class="empty">Add your GPA in <a href="#grades">step 4</a> to see your chances.</div>' :
-      TIERS.map(function (t) {
-        var list = shown.filter(function (r) { return r.t === t[0]; }).sort(function (a, b) { return b.e.p - a.e.p || a.c.mi - b.c.mi; });
-        if (!list.length) return "";
-        return '<div class="tier"><h2 class="c-' + t[0] + '">' + t[1] + " <small>" + t[2] + " · " + list.length + " college" + (list.length > 1 ? "s" : "") + '</small></h2><div class="rows">' +
-          list.map(function (r) { return collegeRow(r.c, r.e, t[0], p); }).join("") + "</div></div>";
-      }).join("");
+      (html || '<div class="empty">' + (region === "saved" ? "Your list is empty. Open a college and tap ☆ Save to add it." : "No colleges match your search.") + "</div>");
+    renderDrawer(p);
     renderTicks(p);
   }
 
-  function collegeRow(c, e, t, p) {
-    var val = e.kind === "est" ? Math.round(e.p * 100) + "%" : e.kind === "seal" ? "Guaranteed" : "Open";
-    var facts = [c.city, "~" + c.mi + " mi", c.pub ? "public" : "private"];
-    var more = [];
-    if (!c.open) more.push("Admit rate " + c.rate + "%");
-    if (c.test === "req") more.push("SAT or ACT required"); else if (c.test === "opt") more.push("test-optional"); else if (c.test === "none") more.push("doesn't use test scores");
-    if (c.pre) more.push("in Indiana Pre-Admissions");
-    if (c.res) more.push("covered by the Honors Plus guarantee");
+  var SITE = { iub: "https://www.indiana.edu/", pur: "https://www.purdue.edu/", nd: "https://www.nd.edu/", rose: "https://www.rose-hulman.edu/",
+    butler: "https://www.butler.edu/", depauw: "https://www.depauw.edu/", bsu: "https://www.bsu.edu/", iui: "https://indianapolis.iu.edu/",
+    isu: "https://indianastate.edu/", usi: "https://www.usi.edu/", pfw: "https://www.pfw.edu/", uindy: "https://www.uindy.edu/",
+    marian: "https://www.marian.edu/", anderson: "https://anderson.edu/", franklin: "https://franklincollege.edu/", hanover: "https://www.hanover.edu/",
+    taylor: "https://www.taylor.edu/", iwu: "https://www.indwes.edu/", ue: "https://www.evansville.edu/", valpo: "https://www.valpo.edu/",
+    trine: "https://www.trine.edu/", vu: "https://www.vinu.edu/", ivy: "https://www.ivytech.edu/", osu: "https://www.osu.edu/", um: "https://umich.edu/",
+    uiuc: "https://illinois.edu/", uk: "https://www.uky.edu/", uc: "https://www.uc.edu/", miami: "https://miamioh.edu/", vandy: "https://www.vanderbilt.edu/" };
+  var BYID = {}; C.forEach(function (c) { BYID[c.id] = c; });
 
-    var ranges = "";
-    if (e.used) {
-      var gmax = c.gs === "w" ? 4.5 : 4.0;
-      ranges = '<div class="ranges">' +
-        bar((c.gs === "w" ? "Weighted GPA" : "GPA") + (c.gsrc === "est" ? " (estimated)" : ""), e.used.g[0], e.used.g[1], e.used.myG, 2.5, gmax, function (v) { return v.toFixed(2); }) +
-        (e.used.s ? bar("SAT", e.used.s[0], e.used.s[1], e.used.useSat ? p.sat : null, 800, 1600, function (v) { return Math.round(v); }) : "") + "</div>";
-    }
-    var notes = e.warn.map(function (w) { return '<li class="warn">' + esc(w) + "</li>"; }).concat(e.notes.concat(c.notes).map(function (x) { return "<li>" + esc(x) + "</li>"; }));
-    return '<details class="col"><summary><div><div class="cn">' + esc(c.name) + '</div><div class="cm">' + esc(facts.join(" · ")) + "</div></div>" +
-      '<div class="meter"><i class="bg-' + t + '" style="width:' + Math.round(e.p * 100) + '%"></i></div>' +
-      '<div class="pct c-' + t + (e.kind === "est" ? "" : " word") + '">' + val + "</div></summary>" +
-      '<div class="more"><div class="facts">' + esc(more.join(" · ")) + "</div>" + ranges + '<div class="facts small">Source: ' + esc(c.data) + "</div>" + (notes.length ? "<ul>" + notes.join("") + "</ul>" : "") + "</div></details>";
+  function valText(e) { return e.kind === "est" ? Math.round(e.p * 100) + "%" : e.kind === "seal" ? "Guaranteed" : e.kind === "na" ? "No major" : "Open"; }
+
+  function collegeRow(c, e, t) {
+    var facts = [c.city, "~" + c.mi + " mi", c.pub ? "public" : "private"];
+    var mv = e.major && e.major.v;
+    var chip = mv && mv < -0.05 ? '<span class="chip2 down">Your major: harder</span>' : mv && mv > 0.05 ? '<span class="chip2 up">Your major: easier</span>' : "";
+    return '<button type="button" class="crow" data-open="' + c.id + '"><div><div class="cn">' + (S.saved[c.id] ? '<span class="savedmark" aria-label="Saved">★</span>' : "") + esc(c.name) + chip + "</div>" +
+      '<div class="cm">' + esc(facts.join(" · ")) + "</div></div>" +
+      '<div class="meter"><i class="bg-' + (t === "na" ? "far" : t) + '" style="width:' + Math.round(e.p * 100) + '%"></i></div>' +
+      '<div class="pct c-' + (t === "na" ? "far" : t) + (e.kind === "est" ? "" : " word") + '">' + valText(e) + "</div></button>";
   }
+
+  /* ---------- College panel ---------- */
+  var ui = { open: null, wi: null, lastFocus: null };
+  function openCollege(id, from) {
+    ui.open = id; ui.wi = null; ui.lastFocus = from || null;
+    renderDrawer(profile());
+    var x = document.querySelector("#drawer [data-close]"); if (x) x.focus();
+  }
+  function closeCollege() {
+    ui.open = null; ui.wi = null;
+    $("drawer").hidden = true; $("scrim").hidden = true; document.body.style.overflow = "";
+    if (ui.lastFocus && document.body.contains(ui.lastFocus)) ui.lastFocus.focus();
+  }
+  function tierOf(e) { return e.kind === "na" ? "far" : e.kind !== "est" ? "likely" : tier(e.p); }
+  function tierName(e) {
+    if (e.kind === "open") return "Open admission";
+    if (e.kind === "seal") return "Guaranteed with your seal";
+    if (e.kind === "na") return "Doesn't offer your major";
+    var t = tier(e.p); return TIERS.filter(function (x) { return x[0] === t; })[0][1];
+  }
+  function renderDrawer(p) {
+    var d = $("drawer");
+    if (!ui.open || !BYID[ui.open]) { d.hidden = true; $("scrim").hidden = true; return; }
+    var c = BYID[ui.open], e = estimate(c, p), t = tierOf(e);
+    var saved = !!S.saved[c.id];
+    var h = '<header class="dh"><div><h2 id="dName">' + esc(c.name) + '</h2><div class="cm">' + esc(c.city) + " · about " + c.mi + " miles from Greenfield · " + (c.pub ? "public" : "private") + "</div></div>" +
+      '<button type="button" class="iconbtn" data-close aria-label="Close">×</button></header>';
+    h += '<div class="dchance"><div class="pct c-' + t + (e.kind === "est" ? "" : " word") + '">' + valText(e) + '</div><div class="lbl"><b class="c-' + t + '">' + tierName(e) + "</b>" +
+      '<span class="muted small">' + (e.kind === "est" ? "Your estimated chance of getting in" : e.kind === "seal" ? "Your Enrollment Honors Plus seal guarantees admission" : e.kind === "open" ? "High school graduates are admitted" : esc(e.major.text)) + "</span></div>" +
+      '<button type="button" class="star" data-star="' + c.id + '" aria-pressed="' + saved + '">' + (saved ? "★ Saved" : "☆ Save") + "</button></div>";
+
+    if (e.kind === "est") {
+      var maxAbs = 0.2;
+      var fx = e.parts.filter(function (q) { return Math.round(q.pts * 100) !== 0; }).sort(function (a, b) { return Math.abs(b.pts) - Math.abs(a.pts); }).map(function (q) {
+        var pts = Math.round(q.pts * 100), w = Math.min(50, Math.abs(q.pts) / maxAbs * 50), cls = q.pts >= 0 ? "pos" : "neg";
+        return '<div class="fx"><span>' + esc(q.k) + '</span><div class="fxbar"><i class="' + cls + '" style="width:' + w + '%"></i></div><span class="v ' + cls + '">' + (pts > 0 ? "+" : pts < 0 ? "−" : "") + Math.abs(pts) + " pts</span></div>";
+      }).join("");
+      h += '<section class="dsec"><h3>What\'s moving your odds</h3><p class="muted small" style="margin:0">A student right in the middle of this college\'s admitted range starts at about <b>' + Math.round(e.base * 100) + "%</b>. Here's how your profile moves that.</p>" + fx + "</section>";
+
+      var u = e.used, wiG = ui.wi ? ui.wi.gpa : (p.wgpa || 3.5), wiS = ui.wi ? ui.wi.sat : (p.sat || (u.s ? Math.round((u.s[0] + u.s[1]) / 20) * 10 : 1200));
+      h += '<section class="dsec"><h3>Try different numbers</h3>' +
+        '<div class="wi"><div class="wl"><label for="wiG">Weighted GPA</label><span id="wiGv">' + wiG.toFixed(2) + '</span></div><input type="range" id="wiG" min="2.0" max="4.5" step="0.05" value="' + wiG + '"></div>' +
+        (u.s ? '<div class="wi"><div class="wl"><label for="wiS">SAT</label><span id="wiSv">' + wiS + '</span></div><input type="range" id="wiS" min="800" max="1600" step="10" value="' + wiS + '"></div>' : '<p class="muted small" style="margin:0">' + esc(c.name) + " doesn't use test scores, so only GPA changes your odds here.</p>") +
+        '<div class="wires" id="wiRes"></div><button type="button" class="btn small" data-wireset style="align-self:flex-start">Reset to my numbers</button></section>';
+
+      var gmax = c.gs === "w" ? 4.6 : 4.5;
+      h += '<section class="dsec"><h3>You vs. admitted students</h3>' +
+        bar((c.gs === "w" ? "Weighted GPA" : "GPA") + (c.gsrc === "est" ? " (estimated)" : ""), u.g[0], u.g[1], u.myG, 2.5, gmax, function (v) { return v.toFixed(2); }) +
+        (u.s ? bar("SAT", u.s[0], u.s[1], u.useSat ? u.mySat : null, 800, 1600, function (v) { return Math.round(v); }) : "") +
+        (c.gs === "w" ? "" : '<p class="muted small" style="margin:0">Compared with your weighted GPA. Most colleges list unweighted ranges, and they also see the AP and ACP classes behind your weighted GPA.</p>') + "</section>";
+    }
+
+    var tests = c.test === "req" ? "Required" : c.test === "opt" ? "Optional" : c.test === "none" ? "Not used" : "Not needed";
+    h += '<section class="dsec"><h3>Quick facts</h3><dl class="facts2">' +
+      "<div><dt>Admit rate</dt><dd>" + (c.open ? "Open admission" : c.rate + "%") + "</dd></div>" +
+      "<div><dt>Distance</dt><dd>About " + c.mi + " miles</dd></div>" +
+      "<div><dt>SAT or ACT</dt><dd>" + tests + "</dd></div>" +
+      "<div><dt>Type</dt><dd>" + (c.pub ? "Public" : "Private") + "</dd></div>" +
+      "<div><dt>Indiana Pre-Admissions</dt><dd>" + (c.pre ? "Yes" : "No") + "</dd></div>" +
+      "<div><dt>Honors Plus guarantee</dt><dd>" + (c.res ? "Yes" : "No") + "</dd></div></dl></section>";
+
+    if (p.major !== "Undecided") {
+      var mtxt = e.major.na ? e.major.text : e.major.text || ("Your major doesn't change your odds much here.");
+      var mv = e.major.v || 0;
+      h += '<section class="dsec"><h3>Your major: ' + esc(p.major) + '</h3><p style="margin:0">' + esc(mtxt) + "</p>" +
+        (mv ? '<p class="muted small" style="margin:0">' + (mv < 0 ? "Harder than this college overall." : "A bit easier than this college's most crowded majors.") + " This is an estimate; most colleges don't publish admit rates by major.</p>" : "") + "</section>";
+    }
+    var notes = e.warn.map(function (w) { return '<li class="warn">' + esc(w) + "</li>"; }).concat((e.notes || []).concat(c.notes).map(function (x) { return "<li>" + esc(x) + "</li>"; }));
+    if (notes.length) h += '<section class="dsec"><h3>Good to know</h3><ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">' + notes.join("") + "</ul></section>";
+    h += '<p class="fine">Source: ' + esc(c.data) + "</p>";
+    h += '<a class="btn primary" style="align-self:flex-start" href="' + SITE[c.id] + '" target="_blank" rel="noopener">Visit ' + esc(c.name) + "'s website</a>";
+    d.innerHTML = h;
+    d.hidden = false; $("scrim").hidden = false; document.body.style.overflow = "hidden";
+    if (e.kind === "est") updateWhatIf(p);
+  }
+  function updateWhatIf(p) {
+    var c = BYID[ui.open]; if (!c) return;
+    var gEl = $("wiG"), sEl = $("wiS");
+    var ov = { gpa: +gEl.value, sat: sEl ? +sEl.value : null };
+    $("wiGv").textContent = ov.gpa.toFixed(2); if (sEl) $("wiSv").textContent = ov.sat;
+    var e = estimate(c, p, ov), now = estimate(c, p);
+    var diff = Math.round(e.p * 100) - Math.round(now.p * 100);
+    $("wiRes").innerHTML = '<span class="small">With these numbers:</span> <b class="c-' + tier(e.p) + '">' + Math.round(e.p * 100) + "%</b> <span class=\"small\">" + tierName(e) +
+      (now.kind === "est" ? (diff ? " · " + (diff > 0 ? "+" : "−") + Math.abs(diff) + " from now" : " · same as now") : "") + "</span>";
+  }
+
   function bar(label, lo, hi, me, min, max, fmt) {
     var span = max - min, l = (lo - min) / span * 100, w = (hi - lo) / span * 100;
     var mine = me == null ? "" : '<div class="you" style="left:' + clamp((me - min) / span * 100, 0, 100) + '%"></div>';
@@ -1019,8 +1246,13 @@ table.t tr:last-child td { border-bottom: 0; }
   /* ---------- Events ---------- */
   function changed() { S.example = false; save(); render(); }
   document.addEventListener("click", function (ev) {
-    var t = ev.target.closest("[data-course],[data-act],[data-sport],[data-region],[data-major],[data-path],#reset,#copyCeeb");
+    if (ev.target.id === "scrim") { closeCollege(); return; }
+    var t = ev.target.closest("[data-course],[data-act],[data-sport],[data-region],[data-major],[data-path],[data-open],[data-close],[data-star],[data-wireset],#reset,#copyCeeb");
     if (!t) return;
+    if (t.dataset.open) { openCollege(t.dataset.open, t); return; }
+    if (t.hasAttribute("data-close")) { closeCollege(); return; }
+    if (t.dataset.star) { if (S.saved[t.dataset.star]) delete S.saved[t.dataset.star]; else S.saved[t.dataset.star] = 1; save(); render(); return; }
+    if (t.hasAttribute("data-wireset")) { ui.wi = null; renderDrawer(profile()); return; }
     if (t.dataset.major) { S.form.major = t.dataset.major; $("majorSearch").value = ""; changed(); return; }
     if (t.dataset.path) { S.seal.newDiploma = t.dataset.path === "new"; changed(); return; }
     if (t.id === "reset") { S = copy(BLANK); loadForm(); build(); save(); location.hash = "#courses"; render(); return; }
@@ -1037,10 +1269,17 @@ table.t tr:last-child td { border-bottom: 0; }
     if (t.dataset.lead) { var st = S.acts[t.dataset.lead] ? S.acts : S.sports; if (st[t.dataset.lead]) st[t.dataset.lead].lead = t.checked; changed(); return; }
     if (t.dataset.seal) { S.seal[t.dataset.seal] = t.checked; changed(); return; }
     if (t.id === "testType") { $("score").value = ""; }
+    if (t.id === "cSort") { render(); return; }
     if (FORM.indexOf(t.id) >= 0 || t.id === "submitTest" || t.id === "firstgen") { readForm(); changed(); }
   });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && ui.open) closeCollege(); });
   document.addEventListener("input", function (ev) {
     if (ev.target.id === "majorSearch") { renderMajors(profile()); return; }
+    if (ev.target.id === "cSearch") { render(); return; }
+    if (ev.target.id === "wiG" || ev.target.id === "wiS") {
+      ui.wi = { gpa: +$("wiG").value, sat: $("wiS") ? +$("wiS").value : null };
+      updateWhatIf(profile()); return;
+    }
     if (FORM.indexOf(ev.target.id) >= 0) { readForm(); changed(); }
   });
   function copyCode(btn) {
@@ -1055,6 +1294,7 @@ table.t tr:last-child td { border-bottom: 0; }
     var v = (location.hash || "").slice(1);
     if (VIEWS.indexOf(v) < 0) v = "courses";
     if (v === "sports" || v === "about" || v === "seal") { S.seen[v] = true; save(); }
+    if (v !== "chances" && ui.open) closeCollege();
     document.querySelectorAll("[data-view]").forEach(function (s) { s.hidden = s.dataset.view !== v; });
     document.querySelectorAll("[data-nav]").forEach(function (a) { if (a.dataset.nav === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     var a = document.querySelector('[data-nav="' + v + '"]');
