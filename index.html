@@ -341,6 +341,10 @@ button.crow:hover { background: var(--soft); }
 .shade { display: inline-flex; gap: 2px; }
 .shade i { width: 12px; height: 12px; border-radius: 2px; display: inline-block; opacity: .45; }
 
+.gamewrap { border-radius: 12px; overflow: hidden; border: 3px solid var(--blue); background: #dfe6f1; }
+.gamewrap canvas { display: block; width: 100%; aspect-ratio: 16 / 9; max-height: 72vh; touch-action: none; cursor: pointer; }
+@media (max-width: 600px) { .gamewrap canvas { aspect-ratio: 4 / 3; } }
+.photo-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; align-items: start; }
 .guide ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
 .guide li b { color: var(--ink); }
@@ -395,6 +399,7 @@ table.t tr:last-child td { border-bottom: 0; }
       <a class="go" href="#chances" data-nav="chances">Your chances <small id="goCount"></small></a>
       <nav class="steps" aria-label="Reference">
         <a href="#guide" data-nav="guide"><span class="tick" style="visibility:hidden"></span>GC guide</a>
+        <a href="#game" data-nav="game"><span class="tick" style="visibility:hidden"></span>Game: Gabe's Run</a>
       </nav>
     </div>
     <div class="side-foot">
@@ -538,6 +543,36 @@ table.t tr:last-child td { border-bottom: 0; }
       <p class="muted small" style="margin:0">Tap a college to see what's moving your odds, try different numbers, and save it to your list.</p>
       <div id="tiers" class="stack"></div>
       <p class="fine">Estimates, not decisions. Each college starts from its admit rate. Your weighted GPA and SAT move the odds by where you fall in its middle-50% range, and your courses, activities, sports, volunteering, essays, and major move them further. Major effects are estimates, because most colleges don't publish admit rates by major.</p>
+    </section>
+
+    <!-- GAME -->
+    <section class="view" data-view="game" aria-labelledby="h1-game" hidden>
+      <header class="vhead">
+        <span class="stepno">Just for fun</span>
+        <h1 id="h1-game">Gabe's Graduation Run</h1>
+        <p>Help Gabe sprint down the GC hallway. Jump the homework piles and wet-floor signs, grab AP credits, and catch college acceptance letters before the bell.</p>
+      </header>
+      <div class="gamewrap"><canvas id="gameCanvas" tabindex="0" aria-label="Gabe's Graduation Run. Press Space or tap to jump. Tap again in the air to double jump."></canvas></div>
+      <p class="muted small" style="margin:0"><b>Jump:</b> Space, ↑, or tap. Tap again in the air to double jump. <b>Pause:</b> P.</p>
+      <div class="panel">
+        <h2>Make Gabe look like Gabe</h2>
+        <div class="fields">
+          <div class="field"><label for="gSkin">Skin tone</label><select id="gSkin">
+            <option value="#f6d7c3">Light</option><option value="#e8b894" selected>Light medium</option><option value="#c68a5e">Medium</option><option value="#8d5a3b">Medium dark</option><option value="#5c3a24">Dark</option></select></div>
+          <div class="field"><label for="gHair">Hair color</label><select id="gHair">
+            <option value="#2a1d14" selected>Dark brown</option><option value="#0f0f10">Black</option><option value="#7a4b24">Brown</option><option value="#c99a4b">Blond</option><option value="#a4471f">Red</option></select></div>
+          <div class="field"><label for="gStyle">Hairstyle</label><select id="gStyle">
+            <option value="short" selected>Short</option><option value="buzz">Buzz cut</option><option value="curly">Curly</option><option value="long">Long</option><option value="cap">Backwards cap</option></select></div>
+          <div class="field"><label for="gShirt">Hoodie</label><select id="gShirt">
+            <option value="#16478e" selected>GC blue</option><option value="#e3bf00">GC gold</option><option value="#f2f2f2">White</option><option value="#2d2f33">Black</option></select></div>
+        </div>
+        <div class="photo-row">
+          <label class="btn" for="gPhoto">Use a photo for Gabe's face</label>
+          <input type="file" id="gPhoto" accept="image/*" hidden>
+          <button type="button" class="btn" id="gPhotoClear" hidden>Remove photo</button>
+          <span class="muted small" id="gPhotoNote">The photo stays on this device only. It's never uploaded or shown to anyone else.</span>
+        </div>
+      </div>
     </section>
 
     <!-- GUIDE -->
@@ -1451,13 +1486,332 @@ table.t tr:last-child td { border-bottom: 0; }
     try { navigator.clipboard.writeText("151350").then(function () { done(true); }, function () { sel(); done(false); }); } catch (e) { sel(); done(false); }
   }
 
+
+  /* ---------- Game: Gabe's Graduation Run (original side-scroller) ----------
+     World units: the canvas is always 360 units tall; its width follows the screen. */
+  var GAME = (function () {
+    var cv = $("gameCanvas"), ctx = cv.getContext("2d");
+    var H = 360, GROUND = 300, W = 640, scale = 1, raf = 0, last = 0, visible = false;
+    var LOOK_KEY = "gc-gabe-look", PHOTO_KEY = "gc-gabe-photo", BEST_KEY = "gc-gabe-best";
+    var look = { skin: "#e8b894", hair: "#2a1d14", style: "short", shirt: "#16478e" };
+    var photo = null, best = 0;
+    try { var sl = JSON.parse(localStorage.getItem(LOOK_KEY) || "null"); if (sl) look = Object.assign(look, sl); } catch (e) {}
+    try { best = +localStorage.getItem(BEST_KEY) || 0; } catch (e) {}
+    try { var pd = localStorage.getItem(PHOTO_KEY); if (pd) { var im = new Image(); im.onload = function () { photo = im; draw(); }; im.src = pd; } } catch (e) {}
+    $("gSkin").value = look.skin; $("gHair").value = look.hair; $("gStyle").value = look.style; $("gShirt").value = look.shirt;
+
+    var COLLEGES = C.filter(function (c) { return !c.open; }).map(function (c) { return c.name.replace("University of ", "").replace(" University", "").replace("Indiana University Bloomington", "IU Bloomington"); });
+    var OBST = {
+      homework: { w: 30, h: 30, label: "a pile of homework" },
+      sign: { w: 26, h: 42, label: "a wet-floor sign" },
+      backpack: { w: 30, h: 30, label: "somebody's backpack" },
+      cart: { w: 56, h: 36, label: "the AV cart" }
+    };
+    var st;
+    function reset() {
+      st = { mode: "ready", t: 0, speed: 330, dist: 0, score: 0, ap: 0, letters: [], y: GROUND, vy: 0, jumps: 0,
+        obs: [], items: [], pops: [], nextObs: 1.2, nextItem: 0.6, cause: "", scroll: 0 };
+    }
+    reset();
+
+    function resize() {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (!r.width) return;
+      cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+      scale = cv.height / H; W = cv.width / scale;
+      draw();
+    }
+    window.addEventListener("resize", function () { if (visible) resize(); });
+
+    function jump() {
+      if (st.mode === "ready") { st.mode = "run"; }
+      if (st.mode === "over") { reset(); st.mode = "run"; return; }
+      if (st.mode === "paused") { st.mode = "run"; return; }
+      if (st.jumps < 2) { st.vy = st.jumps === 0 ? -760 : -640; st.jumps++; }
+    }
+    cv.addEventListener("pointerdown", function (ev) { ev.preventDefault(); cv.focus(); jump(); });
+    window.addEventListener("keydown", function (ev) {
+      if (!visible) return;
+      var tag = (ev.target && ev.target.tagName) || "";
+      if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+      if (ev.code === "Space" || ev.code === "ArrowUp" || ev.code === "KeyW") { ev.preventDefault(); jump(); }
+      else if (ev.code === "KeyP" && (st.mode === "run" || st.mode === "paused")) { st.mode = st.mode === "run" ? "paused" : "run"; draw(); }
+    });
+    document.addEventListener("visibilitychange", function () { if (document.hidden && st.mode === "run") { st.mode = "paused"; draw(); } });
+
+    function rand(a, b) { return a + Math.random() * (b - a); }
+    function update(dt) {
+      if (st.mode !== "run") return;
+      st.t += dt;
+      st.speed = Math.min(780, 330 + st.t * 9);
+      var dx = st.speed * dt;
+      st.dist += dx; st.scroll += dx;
+      st.score = Math.floor(st.dist / 10) + st.ap * 25 + st.letters.length * 100;
+      // Gabe
+      st.vy += 2300 * dt; st.y += st.vy * dt;
+      if (st.y >= GROUND) { st.y = GROUND; st.vy = 0; st.jumps = 0; }
+      // spawn obstacles
+      st.nextObs -= dt;
+      if (st.nextObs <= 0) {
+        var keys = st.t > 12 ? ["homework", "sign", "backpack", "cart"] : ["homework", "sign", "backpack"];
+        var k = keys[Math.floor(Math.random() * keys.length)];
+        st.obs.push({ k: k, x: W + 40, w: OBST[k].w, h: OBST[k].h, hue: Math.floor(rand(0, 4)) });
+        st.nextObs = rand(0.85, 1.7) * (420 / st.speed) + 0.35;
+      }
+      // spawn pickups
+      st.nextItem -= dt;
+      if (st.nextItem <= 0) {
+        var r = Math.random(), kind = r < 0.08 ? "letter" : r < 0.4 ? "ap" : "aplus";
+        var hgt = rand(70, 165), n = kind === "aplus" ? 3 : 1;
+        for (var i = 0; i < n; i++) st.items.push({ kind: kind, x: W + 40 + i * 34, y: GROUND - hgt - Math.sin(i / 2 * Math.PI) * 14, got: false });
+        st.nextItem = rand(0.9, 2.0);
+      }
+      var px0 = 96 - 14, px1 = 96 + 14, py0 = st.y - 116, py1 = st.y - 4; // Gabe is drawn 1.35x size
+      st.obs.forEach(function (o) { o.x -= dx; });
+      st.obs = st.obs.filter(function (o) { return o.x + o.w > -20; });
+      for (var j = 0; j < st.obs.length; j++) {
+        var o = st.obs[j], ox0 = o.x + 4, ox1 = o.x + o.w - 4, oy0 = GROUND - o.h + 4;
+        if (px1 > ox0 && px0 < ox1 && py1 > oy0) { gameOver(OBST[o.k].label); return; }
+      }
+      st.items.forEach(function (it) {
+        it.x -= dx;
+        if (!it.got && Math.abs(it.x - 96) < 26 && it.y > py0 - 14 && it.y < py1 + 6) {
+          it.got = true;
+          if (it.kind === "aplus") { st.dist += 100; pop("+10 A+", it.x, it.y, "#1d7a4b"); }
+          else if (it.kind === "ap") { st.ap++; pop("+25 AP credit", it.x, it.y, "#b38f00"); }
+          else {
+            var name = COLLEGES[Math.floor(Math.random() * COLLEGES.length)];
+            if (st.letters.indexOf(name) < 0) st.letters.push(name);
+            pop("Accepted: " + name + "!", it.x, it.y, "#16478e");
+          }
+        }
+      });
+      st.items = st.items.filter(function (it) { return it.x > -30 && !it.got; });
+      st.pops.forEach(function (q) { q.y -= 40 * dt; q.life -= dt; });
+      st.pops = st.pops.filter(function (q) { return q.life > 0; });
+    }
+    function pop(text, x, y, color) { st.pops.push({ text: text, x: x, y: y, color: color, life: 1.2 }); }
+    function gameOver(cause) {
+      st.mode = "over"; st.cause = cause;
+      if (st.score > best) { best = st.score; try { localStorage.setItem(BEST_KEY, String(best)); } catch (e) {} }
+    }
+
+    /* ----- drawing ----- */
+    function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+    function text(t, x, y, size, color, align, weight) {
+      ctx.font = (weight || "800") + " " + size + "px 'Barlow Condensed', 'Arial Narrow', sans-serif";
+      ctx.fillStyle = color; ctx.textAlign = align || "left"; ctx.fillText(t, x, y);
+    }
+    function background() {
+      ctx.fillStyle = "#dfe6f1"; ctx.fillRect(0, 0, W, H);
+      // ceiling lights
+      ctx.fillStyle = "#f7f9fc";
+      var off = -(st.scroll * 0.3) % 220;
+      for (var x = off - 220; x < W + 220; x += 220) { rr(x + 40, 14, 120, 10, 4); ctx.fill(); }
+      // banners
+      var boff = -(st.scroll * 0.5) % 900;
+      for (var bx = boff - 900; bx < W + 900; bx += 900) {
+        ctx.fillStyle = "#16478e"; rr(bx + 300, 46, 200, 42, 6); ctx.fill();
+        text("GO COUGARS", bx + 400, 76, 26, "#fcdb04", "center");
+      }
+      // lockers
+      var loff = -(st.scroll * 0.5) % 46;
+      for (var lx = loff - 46; lx < W + 46; lx += 46) {
+        ctx.fillStyle = "#1f56a6"; ctx.fillRect(lx, 108, 44, GROUND - 108);
+        ctx.fillStyle = "#16478e"; ctx.fillRect(lx + 42, 108, 4, GROUND - 108);
+        ctx.fillStyle = "rgba(255,255,255,.25)";
+        for (var v = 0; v < 3; v++) ctx.fillRect(lx + 10, 122 + v * 6, 24, 2);
+        ctx.fillStyle = "#c9d6ea"; ctx.fillRect(lx + 34, 196, 4, 16);
+      }
+      // floor
+      ctx.fillStyle = "#cdb98f"; ctx.fillRect(0, GROUND, W, H - GROUND);
+      ctx.fillStyle = "#b9a378"; ctx.fillRect(0, GROUND, W, 4);
+      var foff = -st.scroll % 80;
+      ctx.fillStyle = "rgba(0,0,0,.08)";
+      for (var fx = foff; fx < W; fx += 80) ctx.fillRect(fx, GROUND + 4, 2, H - GROUND);
+    }
+    function drawObstacle(o) {
+      var x = o.x, y = GROUND;
+      if (o.k === "homework") {
+        for (var i = 0; i < 5; i++) { ctx.fillStyle = i % 2 ? "#ffffff" : "#eef2f7"; ctx.fillRect(x + (i % 2) * 2, y - 6 - i * 6, o.w - 2, 6); ctx.fillStyle = "#9fb3d6"; ctx.fillRect(x + 4 + (i % 2) * 2, y - 3 - i * 6, o.w - 12, 1); }
+        text("HW", x + o.w / 2, y - o.h - 2, 12, "#b23a3a", "center");
+      } else if (o.k === "sign") {
+        ctx.fillStyle = "#f2c200"; ctx.beginPath(); ctx.moveTo(x + o.w / 2, y - o.h); ctx.lineTo(x + o.w, y); ctx.lineTo(x, y); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = "#1b1b1b"; ctx.lineWidth = 1.5; ctx.stroke();
+        text("!", x + o.w / 2, y - 10, 18, "#1b1b1b", "center");
+      } else if (o.k === "backpack") {
+        var colors = ["#b23a3a", "#1d7a4b", "#6b3fa0", "#e07a1f"];
+        ctx.fillStyle = colors[o.hue]; rr(x, y - o.h, o.w, o.h, 8); ctx.fill();
+        ctx.fillStyle = "rgba(0,0,0,.18)"; rr(x + 6, y - 14, o.w - 12, 10, 3); ctx.fill();
+      } else {
+        ctx.fillStyle = "#4a5568"; ctx.fillRect(x, y - o.h, o.w, 6); ctx.fillRect(x, y - 16, o.w, 4);
+        ctx.fillRect(x + 2, y - o.h, 4, o.h - 6); ctx.fillRect(x + o.w - 6, y - o.h, 4, o.h - 6);
+        ctx.fillStyle = "#1b1b1b"; ctx.fillRect(x + 12, y - o.h - 20, 30, 20);
+        ctx.fillStyle = "#9fb3d6"; ctx.fillRect(x + 14, y - o.h - 18, 26, 14);
+        ctx.fillStyle = "#222"; ctx.beginPath(); ctx.arc(x + 8, y - 3, 3, 0, 7); ctx.arc(x + o.w - 8, y - 3, 3, 0, 7); ctx.fill();
+      }
+    }
+    function drawItem(it) {
+      if (it.kind === "aplus") {
+        ctx.fillStyle = "#fff"; rr(it.x - 10, it.y - 12, 20, 24, 2); ctx.fill(); ctx.strokeStyle = "#cfd8e6"; ctx.lineWidth = 1; ctx.stroke();
+        text("A+", it.x, it.y + 5, 13, "#1d7a4b", "center");
+      } else if (it.kind === "ap") {
+        ctx.fillStyle = "#fcdb04"; ctx.beginPath();
+        for (var i = 0; i < 10; i++) { var a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 6 : 14; ctx.lineTo(it.x + Math.cos(a) * r, it.y + Math.sin(a) * r); }
+        ctx.closePath(); ctx.fill(); ctx.strokeStyle = "#b38f00"; ctx.lineWidth = 1.5; ctx.stroke();
+        text("AP", it.x, it.y + 4, 9, "#5a4300", "center");
+      } else {
+        var bob = Math.sin(st.t * 6) * 3;
+        ctx.fillStyle = "#fffdf5"; rr(it.x - 16, it.y - 11 + bob, 32, 22, 3); ctx.fill(); ctx.strokeStyle = "#16478e"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(it.x - 16, it.y - 11 + bob); ctx.lineTo(it.x, it.y + 2 + bob); ctx.lineTo(it.x + 16, it.y - 11 + bob); ctx.stroke();
+        ctx.fillStyle = "#b23a3a"; ctx.beginPath(); ctx.arc(it.x, it.y + 2 + bob, 3.5, 0, 7); ctx.fill();
+      }
+    }
+    function drawGabe(x, feet, t, air) {
+      var stride = air ? 0 : Math.sin(t * 16), hipY = feet - 34, shoulderY = feet - 62;
+      ctx.lineCap = "round";
+      // legs
+      [[1, "#24365c"], [-1, "#2b3f66"]].forEach(function (L) {
+        var sw = air ? (L[0] > 0 ? -0.6 : 0.5) : stride * 0.7 * L[0];
+        var kx = x + Math.sin(sw) * 16, ky = hipY + Math.cos(sw) * 16;
+        var fx = kx + Math.sin(sw - (air ? 0.9 : Math.max(0, -sw) * 1.2)) * 17, fy = ky + Math.cos(sw - (air ? 0.9 : 0)) * 17;
+        ctx.strokeStyle = L[1]; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(x, hipY); ctx.lineTo(kx, ky); ctx.lineTo(fx, Math.min(fy, feet - 3)); ctx.stroke();
+        ctx.fillStyle = "#f5f5f5"; rr(fx - 5, Math.min(fy, feet - 3) - 3, 14, 7, 3); ctx.fill();
+        ctx.fillStyle = "#16478e"; ctx.fillRect(fx - 4, Math.min(fy, feet - 3) + 2, 12, 2);
+      });
+      // back arm
+      var as = air ? -1.4 : -stride * 0.8;
+      ctx.strokeStyle = shade(look.shirt, -0.2); ctx.lineWidth = 7;
+      ctx.beginPath(); ctx.moveTo(x, shoulderY + 4); ctx.lineTo(x + Math.sin(as) * 18, shoulderY + 4 + Math.cos(as) * 18); ctx.stroke();
+      // hoodie
+      ctx.fillStyle = look.shirt; rr(x - 13, shoulderY - 2, 26, 34, 8); ctx.fill();
+      ctx.fillStyle = shade(look.shirt, -0.15); ctx.fillRect(x - 13, hipY - 6, 26, 6);
+      text("GC", x, shoulderY + 20, 13, look.shirt === "#e3bf00" ? "#16478e" : "#fcdb04", "center");
+      // front arm
+      var af = air ? -1.6 : stride * 0.8;
+      ctx.strokeStyle = shade(look.shirt, 0.06); ctx.lineWidth = 7;
+      var hx = x + Math.sin(af) * 18, hy = shoulderY + 4 + Math.cos(af) * 18;
+      ctx.beginPath(); ctx.moveTo(x, shoulderY + 4); ctx.lineTo(hx, hy); ctx.stroke();
+      ctx.fillStyle = look.skin; ctx.beginPath(); ctx.arc(hx, hy, 4, 0, 7); ctx.fill();
+      // head
+      var hcx = x + 1, hcy = shoulderY - 16, R = 15;
+      ctx.fillStyle = look.skin; ctx.fillRect(hcx - 4, shoulderY - 6, 8, 6);
+      if (photo) {
+        ctx.save(); ctx.beginPath(); ctx.arc(hcx, hcy, R, 0, 7); ctx.clip();
+        var s = Math.min(photo.width, photo.height);
+        ctx.drawImage(photo, (photo.width - s) / 2, (photo.height - s) / 2, s, s, hcx - R, hcy - R, R * 2, R * 2);
+        ctx.restore();
+        ctx.strokeStyle = "#16478e"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(hcx, hcy, R, 0, 7); ctx.stroke();
+      } else {
+        ctx.fillStyle = look.skin; ctx.beginPath(); ctx.arc(hcx, hcy, R, 0, 7); ctx.fill();
+        ctx.fillStyle = shade(look.skin, -0.12); ctx.beginPath(); ctx.arc(hcx - 13, hcy + 2, 3.5, 0, 7); ctx.fill();
+        hair(hcx, hcy, R);
+        ctx.fillStyle = "#1b1b1b"; ctx.beginPath(); ctx.arc(hcx + 5, hcy - 1, 2, 0, 7); ctx.arc(hcx + 11, hcy - 1, 2, 0, 7); ctx.fill();
+        ctx.strokeStyle = "#1b1b1b"; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(hcx + 8, hcy + 4, 5, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
+      }
+      if (st.mode === "over") { text("✶", hcx + 18, hcy - 14, 16, "#fcdb04", "center"); text("✶", hcx - 16, hcy - 20, 12, "#fcdb04", "center"); }
+    }
+    function hair(cx, cy, R) {
+      ctx.fillStyle = look.hair;
+      if (look.style === "buzz") { ctx.beginPath(); ctx.arc(cx, cy, R + 1, Math.PI * 1.02, Math.PI * 1.98); ctx.lineTo(cx + R - 4, cy - 6); ctx.lineTo(cx - R, cy - 2); ctx.closePath(); ctx.globalAlpha = 0.85; ctx.fill(); ctx.globalAlpha = 1; }
+      else if (look.style === "curly") { for (var i = 0; i < 8; i++) { var a = Math.PI * (1.05 + i * 0.13); ctx.beginPath(); ctx.arc(cx + Math.cos(a) * (R - 1), cy + Math.sin(a) * (R - 1), 6, 0, 7); ctx.fill(); } }
+      else if (look.style === "long") { ctx.beginPath(); ctx.arc(cx, cy - 1, R + 2, Math.PI, Math.PI * 2); ctx.fill(); ctx.fillRect(cx - R - 2, cy - 2, 9, R + 8); }
+      else if (look.style === "cap") {
+        ctx.fillStyle = "#16478e"; ctx.beginPath(); ctx.arc(cx, cy - 2, R + 1, Math.PI, Math.PI * 2); ctx.fill();
+        ctx.fillRect(cx - R - 9, cy - 5, 12, 4); ctx.fillStyle = "#fcdb04"; ctx.fillRect(cx - 2, cy - 15, 6, 3);
+        ctx.fillStyle = look.hair; ctx.fillRect(cx + R - 6, cy - 4, 6, 6);
+      }
+      else { ctx.beginPath(); ctx.arc(cx, cy - 2, R + 1, Math.PI * 0.98, Math.PI * 2.02); ctx.lineTo(cx + R - 2, cy - 3); ctx.quadraticCurveTo(cx + 4, cy - 10, cx - R + 2, cy - 1); ctx.closePath(); ctx.fill(); }
+    }
+    function shade(hex, amt) {
+      var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+      function f(c) { return Math.max(0, Math.min(255, Math.round(amt < 0 ? c * (1 + amt) : c + (255 - c) * amt))); }
+      return "rgb(" + f(r) + "," + f(g) + "," + f(b) + ")";
+    }
+    function hud() {
+      ctx.fillStyle = "rgba(14,49,104,.88)"; rr(10, 10, 210, 34, 8); ctx.fill();
+      text("SCORE " + st.score, 22, 35, 22, "#fff");
+      text("BEST " + best, 212, 35, 16, "#fcdb04", "right", "700");
+      if (st.letters.length) { ctx.fillStyle = "rgba(14,49,104,.88)"; rr(W - 170, 10, 160, 34, 8); ctx.fill(); text("✉ " + st.letters.length + " acceptance" + (st.letters.length > 1 ? "s" : ""), W - 90, 33, 18, "#fcdb04", "center"); }
+    }
+    function card(lines) {
+      var w = Math.min(W - 40, 460), h = 34 + lines.length * 30, x = (W - w) / 2, y = (H - h) / 2 - 20;
+      ctx.fillStyle = "rgba(14,49,104,.94)"; rr(x, y, w, h, 12); ctx.fill();
+      ctx.strokeStyle = "#fcdb04"; ctx.lineWidth = 3; ctx.stroke();
+      lines.forEach(function (l, i) { text(l[0], W / 2, y + 40 + i * 30, l[1], l[2], "center", l[3]); });
+    }
+    function draw() {
+      if (!cv.width) return;
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
+      background();
+      st.obs.forEach(drawObstacle);
+      st.items.forEach(drawItem);
+      ctx.save(); ctx.translate(96, st.y); ctx.scale(1.35, 1.35);
+      drawGabe(0, 0, st.t, st.y < GROUND - 1);
+      ctx.restore();
+      st.pops.forEach(function (q) { ctx.globalAlpha = Math.min(1, q.life * 1.5); text(q.text, q.x, q.y, 16, q.color, "center"); ctx.globalAlpha = 1; });
+      hud();
+      if (st.mode === "ready") card([["GABE'S GRADUATION RUN", 30, "#fcdb04"], ["Tap or press Space to start", 18, "#fff", "600"], ["Jump the homework · grab AP credits · catch acceptance letters", 14, "#cfdcf3", "500"]]);
+      if (st.mode === "paused") card([["PAUSED", 30, "#fcdb04"], ["Tap or press P to keep running", 18, "#fff", "600"]]);
+      if (st.mode === "over") {
+        var acc = st.letters.length ? "Accepted to " + st.letters.slice(0, 3).join(", ") + (st.letters.length > 3 ? " +" + (st.letters.length - 3) + " more" : "") : "No acceptance letters this run";
+        card([["TARDY!", 32, "#fcdb04"], ["Gabe tripped over " + st.cause + ".", 18, "#fff", "600"],
+          ["Score " + st.score + (st.score >= best && st.score > 0 ? " · New best!" : " · Best " + best), 20, "#fff"],
+          [acc, 15, "#cfdcf3", "500"], ["Tap or press Space to run again", 16, "#fcdb04", "600"]]);
+      }
+    }
+    function frame(ts) {
+      if (!visible) return;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (Math.abs(cv.width - Math.round(cv.clientWidth * dpr)) > 1 || Math.abs(cv.height - Math.round(cv.clientHeight * dpr)) > 1) resize();
+      var dt = Math.min(0.033, (ts - (last || ts)) / 1000); last = ts;
+      update(dt); draw();
+      raf = requestAnimationFrame(frame);
+    }
+
+    /* ----- look + photo ----- */
+    function saveLook() { try { localStorage.setItem(LOOK_KEY, JSON.stringify(look)); } catch (e) {} draw(); }
+    [["gSkin", "skin"], ["gHair", "hair"], ["gStyle", "style"], ["gShirt", "shirt"]].forEach(function (pair) {
+      $(pair[0]).addEventListener("change", function () { look[pair[1]] = this.value; saveLook(); });
+    });
+    function showPhotoState() { $("gPhotoClear").hidden = !photo; }
+    $("gPhoto").addEventListener("change", function () {
+      var f = this.files && this.files[0]; if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function () {
+        var src = new Image();
+        src.onload = function () {
+          // Shrink to a small square so it fits in this browser's storage.
+          var c2 = document.createElement("canvas"), sz = 200, s = Math.min(src.width, src.height);
+          c2.width = sz; c2.height = sz;
+          c2.getContext("2d").drawImage(src, (src.width - s) / 2, (src.height - s) / 2, s, s, 0, 0, sz, sz);
+          var url = c2.toDataURL("image/jpeg", 0.85), im2 = new Image();
+          im2.onload = function () { photo = im2; showPhotoState(); draw(); };
+          im2.src = url;
+          try { localStorage.setItem(PHOTO_KEY, url); } catch (e) {}
+        };
+        src.src = rd.result;
+      };
+      rd.readAsDataURL(f);
+      this.value = "";
+    });
+    $("gPhotoClear").addEventListener("click", function () { photo = null; try { localStorage.removeItem(PHOTO_KEY); } catch (e) {} showPhotoState(); draw(); });
+    showPhotoState();
+
+    return {
+      show: function () { if (visible) return; visible = true; resize(); last = 0; raf = requestAnimationFrame(frame); },
+      hide: function () { if (!visible) return; visible = false; cancelAnimationFrame(raf); if (st.mode === "run") st.mode = "paused"; }
+    };
+  })();
+
   /* ---------- Routing ---------- */
-  var VIEWS = ["courses", "activities", "sports", "grades", "about", "seal", "chances", "guide"];
+  var VIEWS = ["courses", "activities", "sports", "grades", "about", "seal", "chances", "guide", "game"];
   function route() {
     var v = (location.hash || "").slice(1);
     if (VIEWS.indexOf(v) < 0) v = "courses";
     if (v === "sports" || v === "about" || v === "seal") { S.seen[v] = true; save(); }
     if (v !== "chances" && ui.open) closeCollege();
+    if (v === "game") GAME.show(); else GAME.hide();
     document.querySelectorAll("[data-view]").forEach(function (s) { s.hidden = s.dataset.view !== v; });
     document.querySelectorAll("[data-nav]").forEach(function (a) { if (a.dataset.nav === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     var a = document.querySelector('[data-nav="' + v + '"]');
