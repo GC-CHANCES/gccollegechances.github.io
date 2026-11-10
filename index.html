@@ -341,9 +341,41 @@ button.crow:hover { background: var(--soft); }
 .shade { display: inline-flex; gap: 2px; }
 .shade i { width: 12px; height: 12px; border-radius: 2px; display: inline-block; opacity: .45; }
 
-.gamewrap { border-radius: 12px; overflow: hidden; border: 3px solid var(--blue); background: #dfe6f1; }
-.gamewrap canvas { display: block; width: 100%; aspect-ratio: 16 / 9; max-height: 72vh; touch-action: none; cursor: pointer; }
-@media (max-width: 600px) { .gamewrap canvas { aspect-ratio: 4 / 3; } }
+.dwrap { position: relative; border-radius: 12px; overflow: hidden; border: 3px solid var(--blue); background: #0b1430; aspect-ratio: 16 / 9; max-height: 76vh; touch-action: none; user-select: none; -webkit-user-select: none; }
+@media (max-width: 600px) { .dwrap { aspect-ratio: 3 / 4; } }
+.dwrap canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+.dhud { position: absolute; top: 10px; left: 12px; right: 12px; display: flex; flex-direction: column; gap: 6px; pointer-events: none; font-family: var(--font-head); color: #fff; }
+.dhp { display: flex; align-items: center; gap: 10px; }
+.dhp span { font-size: 16px; font-weight: 800; letter-spacing: .04em; text-shadow: 0 1px 2px #000; white-space: nowrap; }
+.dbar { flex: 1; height: 12px; border-radius: 6px; background: rgba(255,255,255,.2); overflow: hidden; border: 1px solid rgba(255,255,255,.4); }
+.dbar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #b23a3a, #ff7a1a); transition: width .2s; }
+.drow { display: flex; justify-content: space-between; font-size: 20px; font-weight: 800; text-shadow: 0 1px 2px #000; }
+.drow #gHearts { color: #ff5a5a; letter-spacing: 2px; }
+.dmsg { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; background: rgba(8,16,40,.55); }
+.dmsg[hidden] { display: none !important; }
+.dcard { max-width: 440px; text-align: center; background: rgba(14,49,104,.95); border: 3px solid #fcdb04; border-radius: 14px; padding: 18px 22px; color: #fff; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.dcard h3 { font-size: 34px; color: #fcdb04; text-transform: uppercase; }
+.dcard p { margin: 0; font-size: 15px; color: #dbe6fa; }
+.dcard .btn { margin-top: 6px; background: #fcdb04; border-color: #fcdb04; color: #1b2238; }
+.dpad { position: absolute; left: 10px; right: 10px; bottom: 10px; display: none; justify-content: space-between; align-items: flex-end; pointer-events: none; }
+.dpad button { pointer-events: auto; touch-action: none; border: 2px solid rgba(255,255,255,.6); background: rgba(14,49,104,.6); color: #fff; font-family: var(--font-head); font-weight: 800; border-radius: 12px; }
+.dmove { display: grid; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(2, 48px); gap: 4px; }
+.dmove button[data-k="up"] { grid-column: 2; grid-row: 1; }
+.dmove button[data-k="left"] { grid-column: 1; grid-row: 2; }
+.dmove button[data-k="down"] { grid-column: 2; grid-row: 2; }
+.dmove button[data-k="right"] { grid-column: 3; grid-row: 2; }
+.dact { display: flex; gap: 8px; align-items: flex-end; }
+.dact button { width: 64px; height: 52px; font-size: 15px; }
+.dact .kick { width: 84px; height: 84px; border-radius: 50%; background: rgba(252,219,4,.85); color: #1b2238; font-size: 20px; }
+@media (hover: none), (max-width: 700px) { .dpad { display: flex; } }
+.codeform { display: flex; flex-direction: column; gap: 6px; }
+.codeform div { display: flex; gap: 6px; }
+.codeform input { flex: 1; min-width: 0; font: inherit; font-size: 14px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; text-transform: uppercase; }
+.codeform button { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff; cursor: pointer; }
+.codeform.big input { font-size: 17px; padding: 10px 12px; border-color: var(--line); background: var(--bg); color: var(--ink); }
+.codeform.big button { font-size: 15px; padding: 10px 18px; color: #fff; }
+.codemsg { font-size: 12.5px; min-height: 1em; }
+.codeform.big .codemsg { color: var(--muted); }
 .photo-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; align-items: start; }
 .guide ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
@@ -399,10 +431,11 @@ table.t tr:last-child td { border-bottom: 0; }
       <a class="go" href="#chances" data-nav="chances">Your chances <small id="goCount"></small></a>
       <nav class="steps" aria-label="Reference">
         <a href="#guide" data-nav="guide"><span class="tick" style="visibility:hidden"></span>GC guide</a>
-        <a href="#game" data-nav="game"><span class="tick" style="visibility:hidden"></span>Game: Gabe's Run</a>
+        <a href="#secret" data-nav="secret" id="secretNav" hidden><span class="tick" style="visibility:hidden"></span>Secret</a>
       </nav>
     </div>
     <div class="side-foot">
+      <form class="codeform" data-codeform autocomplete="off"><label for="codeSide">Have a code?</label><div><input id="codeSide" type="text" spellcheck="false" autocapitalize="characters"><button type="submit">Go</button></div><span class="codemsg" aria-live="polite"></span></form>
       <span>Made for students, not an official Greenfield-Central site. Your answers stay in this browser.</span>
       <button type="button" id="reset">Start over with a blank profile</button>
     </div>
@@ -545,32 +578,32 @@ table.t tr:last-child td { border-bottom: 0; }
       <p class="fine">Estimates, not decisions. Each college starts from its admit rate. Your weighted GPA and SAT move the odds by where you fall in its middle-50% range, and your courses, activities, sports, volunteering, essays, and major move them further. Major effects are estimates, because most colleges don't publish admit rates by major.</p>
     </section>
 
-    <!-- GAME -->
-    <section class="view" data-view="game" aria-labelledby="h1-game" hidden>
+    <!-- SECRET -->
+    <section class="view" data-view="secret" aria-labelledby="h1-secret" hidden>
       <header class="vhead">
-        <span class="stepno">Just for fun</span>
-        <h1 id="h1-game">Gabe's Graduation Run</h1>
-        <p>Help Gabe sprint down the GC hallway. Jump the homework piles and wet-floor signs, grab AP credits, and catch college acceptance letters before the bell.</p>
+        <span class="stepno">Secret · Gabe's idea</span>
+        <h1 id="h1-secret">Gabe vs. the Dragon</h1>
+        <p>A rival dragon has landed on the GC soccer field at night. Gabe, #99, has a bag of soccer balls and one job: knock it out of the sky and bring the bell home.</p>
       </header>
-      <div class="gamewrap"><canvas id="gameCanvas" tabindex="0" aria-label="Gabe's Graduation Run. Press Space or tap to jump. Tap again in the air to double jump."></canvas></div>
-      <p class="muted small" style="margin:0"><b>Jump:</b> Space, ↑, or tap. Tap again in the air to double jump. <b>Pause:</b> P.</p>
-      <div class="panel">
-        <h2>Make Gabe look like Gabe</h2>
-        <div class="fields">
-          <div class="field"><label for="gSkin">Skin tone</label><select id="gSkin">
-            <option value="#f6d7c3">Light</option><option value="#e8b894" selected>Light medium</option><option value="#c68a5e">Medium</option><option value="#8d5a3b">Medium dark</option><option value="#5c3a24">Dark</option></select></div>
-          <div class="field"><label for="gHair">Hair color</label><select id="gHair">
-            <option value="#2a1d14" selected>Dark brown</option><option value="#0f0f10">Black</option><option value="#7a4b24">Brown</option><option value="#c99a4b">Blond</option><option value="#a4471f">Red</option></select></div>
-          <div class="field"><label for="gStyle">Hairstyle</label><select id="gStyle">
-            <option value="short" selected>Short</option><option value="buzz">Buzz cut</option><option value="curly">Curly</option><option value="long">Long</option><option value="cap">Backwards cap</option></select></div>
-          <div class="field"><label for="gShirt">Hoodie</label><select id="gShirt">
-            <option value="#16478e" selected>GC blue</option><option value="#e3bf00">GC gold</option><option value="#f2f2f2">White</option><option value="#2d2f33">Black</option></select></div>
+      <div class="dwrap" id="dragonWrap">
+        <div class="dhud">
+          <div class="dhp"><span>RIVAL DRAGON</span><div class="dbar"><i id="dHp"></i></div></div>
+          <div class="drow"><span id="gHearts" aria-label="Gabe's health"></span><span id="dTime">0:00</span></div>
         </div>
+        <div class="dmsg" id="dMsg"></div>
+        <div class="dpad" id="dPad" aria-hidden="true">
+          <div class="dmove"><button data-k="up">▲</button><button data-k="left">◀</button><button data-k="down">▼</button><button data-k="right">▶</button></div>
+          <div class="dact"><button data-k="jump">JUMP</button><button data-k="kick" class="kick">KICK</button></div>
+        </div>
+      </div>
+      <p class="muted small" style="margin:0"><b>Move:</b> W A S D or arrow keys. <b>Kick:</b> Space, K, or click. <b>Jump:</b> Shift or J. On a phone, use the buttons. The camera always faces the dragon.</p>
+      <div class="panel">
+        <h2>Put Gabe's face on him</h2>
         <div class="photo-row">
-          <label class="btn" for="gPhoto">Use a photo for Gabe's face</label>
-          <input type="file" id="gPhoto" accept="image/*" hidden>
-          <button type="button" class="btn" id="gPhotoClear" hidden>Remove photo</button>
-          <span class="muted small" id="gPhotoNote">The photo stays on this device only. It's never uploaded or shown to anyone else.</span>
+          <label class="btn" for="dPhoto">Choose a photo</label>
+          <input type="file" id="dPhoto" accept="image/*" hidden>
+          <button type="button" class="btn" id="dPhotoClear" hidden>Remove photo</button>
+          <span class="muted small">The photo stays on this device only. It's never uploaded or shown to anyone else.</span>
         </div>
       </div>
     </section>
@@ -629,6 +662,10 @@ table.t tr:last-child td { border-bottom: 0; }
             <li><span class="w">Apr 15</span><span>Indiana FAFSA deadline for state aid and 21st Century Scholars.</span></li>
           </ol>
         </div>
+      </div>
+      <div class="panel" style="max-width:420px">
+        <h2>Have a code?</h2>
+        <form class="codeform big" data-codeform autocomplete="off"><label for="codeGuide" class="muted small">Enter it here.</label><div><input id="codeGuide" type="text" spellcheck="false" autocapitalize="characters"><button type="submit" class="btn primary">Unlock</button></div><span class="codemsg" aria-live="polite"></span></form>
       </div>
       <p class="fine">Sources: <a href="https://gchs.gcsc.k12.in.us/wp-content/uploads/2026/02/Curriculum-Guide-2026-27-1.pdf" target="_blank" rel="noopener">G-CHS 2026–27 Course of Study</a>, <a href="https://gchs.gcsc.k12.in.us/wp-content/uploads/2025/05/Extracurricular-Activities-and-Interests.pdf" target="_blank" rel="noopener">G-CHS activities list</a>, <a href="https://gchs.gcsc.k12.in.us/wp-content/uploads/2025/06/Diploma-Comparison-12.11.24.pdf" target="_blank" rel="noopener">G-CHS diploma comparison</a>, <a href="https://learnmoreindiana.org/preadmit/" target="_blank" rel="noopener">Indiana Pre-Admissions</a>, and the <a href="https://www.admissions.purdue.edu/become-student/class-profile" target="_blank" rel="noopener">Purdue</a> and <a href="https://bloomington.iu.edu/admissions/class-profile.html" target="_blank" rel="noopener">IU</a> class profiles. College admit rates and SAT ranges come from each college's fall 2025 Common Data Set or class profile where available (Purdue, IU, Butler, Indiana State, USI, Valparaiso), and otherwise from the U.S. Department of Education's <a href="https://nces.ed.gov/ipeds/" target="_blank" rel="noopener">IPEDS</a> admissions survey for fall 2023, the newest posted. GPA ranges marked estimated are estimates because most colleges don't publish a GPA range. Each college's exact source is listed when you open it. Not made or endorsed by Greenfield-Central Community Schools or any college.</p>
     </section>
@@ -1487,331 +1524,445 @@ table.t tr:last-child td { border-bottom: 0; }
   }
 
 
-  /* ---------- Game: Gabe's Graduation Run (original side-scroller) ----------
-     World units: the canvas is always 360 units tall; its width follows the screen. */
-  var GAME = (function () {
-    var cv = $("gameCanvas"), ctx = cv.getContext("2d");
-    var H = 360, GROUND = 300, W = 640, scale = 1, raf = 0, last = 0, visible = false;
-    var LOOK_KEY = "gc-gabe-look", PHOTO_KEY = "gc-gabe-photo", BEST_KEY = "gc-gabe-best";
-    var look = { skin: "#e8b894", hair: "#2a1d14", style: "short", shirt: "#16478e" };
-    var photo = null, best = 0;
-    try { var sl = JSON.parse(localStorage.getItem(LOOK_KEY) || "null"); if (sl) look = Object.assign(look, sl); } catch (e) {}
+  /* ---------- Secret code ---------- */
+  var SECRET_KEY = "gc-secret-unlocked", unlocked = false;
+  try { unlocked = localStorage.getItem(SECRET_KEY) === "1"; } catch (e) {}
+  function showSecretNav() { $("secretNav").hidden = !unlocked; }
+  showSecretNav();
+  document.querySelectorAll("[data-codeform]").forEach(function (f) {
+    f.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var inp = f.querySelector("input"), msg = f.querySelector(".codemsg");
+      if ((inp.value || "").trim().toUpperCase() === "STEVE") {
+        unlocked = true; try { localStorage.setItem(SECRET_KEY, "1"); } catch (e) {}
+        showSecretNav(); inp.value = ""; msg.textContent = "Unlocked.";
+        if (location.hash === "#secret") route(); else location.hash = "#secret";
+      } else { msg.textContent = "That code doesn't work."; }
+    });
+  });
+
+  /* ---------- Secret game: Gabe vs. the Dragon (original 3D boss fight, three.js) ---------- */
+  var DRAGON = (function () {
+    var wrap = $("dragonWrap"), msgEl = $("dMsg");
+    var T, renderer, scene, camera, clock, gabe, dragon, ballGeo, ballMat, fireGeo, fireMat, faceMesh;
+    var ready = false, loading = false, visible = false, raf = 0;
+    var keys = {}, st = null, best = 0, PHOTO_KEY = "gc-gabe-photo", BEST_KEY = "gc-dragon-best";
     try { best = +localStorage.getItem(BEST_KEY) || 0; } catch (e) {}
-    try { var pd = localStorage.getItem(PHOTO_KEY); if (pd) { var im = new Image(); im.onload = function () { photo = im; draw(); }; im.src = pd; } } catch (e) {}
-    $("gSkin").value = look.skin; $("gHair").value = look.hair; $("gStyle").value = look.style; $("gShirt").value = look.shirt;
 
-    var COLLEGES = C.filter(function (c) { return !c.open; }).map(function (c) { return c.name.replace("University of ", "").replace(" University", "").replace("Indiana University Bloomington", "IU Bloomington"); });
-    var OBST = {
-      homework: { w: 30, h: 30, label: "a pile of homework" },
-      sign: { w: 26, h: 42, label: "a wet-floor sign" },
-      backpack: { w: 30, h: 30, label: "somebody's backpack" },
-      cart: { w: 56, h: 36, label: "the AV cart" }
-    };
-    var st;
-    function reset() {
-      st = { mode: "ready", t: 0, speed: 330, dist: 0, score: 0, ap: 0, letters: [], y: GROUND, vy: 0, jumps: 0,
-        obs: [], items: [], pops: [], nextObs: 1.2, nextItem: 0.6, cause: "", scroll: 0 };
+    function showMsg(html) { msgEl.innerHTML = '<div class="dcard">' + html + "</div>"; msgEl.hidden = false; }
+    function hideMsg() { msgEl.hidden = true; }
+    function fmt(t) { t = Math.floor(t); return Math.floor(t / 60) + ":" + ("0" + (t % 60)).slice(-2); }
+
+    function loadThree(cb) {
+      if (window.THREE) return cb();
+      if (loading) return;
+      loading = true;
+      showMsg("<h3>Loading…</h3><p>Getting the 3D field ready.</p>");
+      var sc = document.createElement("script");
+      sc.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+      sc.onload = function () { loading = false; cb(); };
+      sc.onerror = function () { loading = false; showMsg("<h3>Couldn't load</h3><p>The 3D engine didn't load. Check your connection and refresh.</p>"); };
+      document.head.appendChild(sc);
     }
-    reset();
 
+    /* ----- textures drawn on canvas ----- */
+    function canvasTex(w, h, paint) { var c = document.createElement("canvas"); c.width = w; c.height = h; paint(c.getContext("2d"), w, h); var t = new T.CanvasTexture(c); t.anisotropy = 4; return t; }
+    function fieldTex() {
+      return canvasTex(1024, 660, function (x, w, h) {
+        for (var i = 0; i < 12; i++) { x.fillStyle = i % 2 ? "#2f8f3a" : "#2a8234"; x.fillRect(i * w / 12, 0, w / 12 + 1, h); }
+        x.strokeStyle = "rgba(255,255,255,.9)"; x.lineWidth = 5;
+        x.strokeRect(20, 20, w - 40, h - 40);
+        x.beginPath(); x.moveTo(w / 2, 20); x.lineTo(w / 2, h - 20); x.stroke();
+        x.beginPath(); x.arc(w / 2, h / 2, 90, 0, 7); x.stroke();
+        x.strokeRect(20, h / 2 - 160, 160, 320); x.strokeRect(w - 180, h / 2 - 160, 160, 320);
+        x.strokeRect(20, h / 2 - 70, 55, 140); x.strokeRect(w - 75, h / 2 - 70, 55, 140);
+        x.fillStyle = "#fff"; x.beginPath(); x.arc(w / 2, h / 2, 6, 0, 7); x.fill();
+      });
+    }
+    function jerseyTex(back) {
+      return canvasTex(256, 256, function (x, w, h) {
+        x.fillStyle = "#d4d7db"; x.fillRect(0, 0, w, h);
+        x.fillStyle = "#d7f20f"; x.beginPath(); x.moveTo(70, 0); x.lineTo(128, back ? 18 : 70); x.lineTo(186, 0); x.lineTo(160, 0); x.lineTo(128, back ? 8 : 45); x.lineTo(96, 0); x.closePath(); x.fill();
+        x.fillStyle = "#1b1b1b"; x.font = "900 " + (back ? 120 : 70) + "px Arial Black, Arial, sans-serif"; x.textAlign = "center";
+        x.fillText("99", back ? 128 : 110, back ? 170 : 165);
+        if (!back) { x.fillStyle = "#16478e"; x.fillRect(168, 92, 34, 42); x.fillStyle = "#fcdb04"; x.fillRect(176, 100, 18, 26); }
+      });
+    }
+    function ballTex() {
+      return canvasTex(256, 128, function (x, w, h) {
+        x.fillStyle = "#fff"; x.fillRect(0, 0, w, h); x.fillStyle = "#111";
+        [[30, 30], [100, 70], [170, 25], [230, 80], [60, 105], [140, 110], [200, 120]].forEach(function (p) {
+          x.beginPath(); for (var i = 0; i < 5; i++) { var a = i / 5 * Math.PI * 2 - Math.PI / 2; x.lineTo(p[0] + Math.cos(a) * 14, p[1] + Math.sin(a) * 14); } x.closePath(); x.fill();
+        });
+      });
+    }
+    function boardTex() {
+      return canvasTex(1024, 64, function (x, w, h) {
+        x.fillStyle = "#16478e"; x.fillRect(0, 0, w, h);
+        x.fillStyle = "#fcdb04"; x.font = "800 40px 'Barlow Condensed', Arial Narrow, sans-serif"; x.textAlign = "center";
+        x.fillText("GO COUGARS  ·  GREENFIELD-CENTRAL  ·  GO COUGARS  ·  #99", w / 2, 46);
+      });
+    }
+
+    function std(color, opts) { var m = new T.MeshStandardMaterial(Object.assign({ color: color, roughness: 0.75, metalness: 0 }, opts || {})); return m; }
+    function box(w, h, d, mat) { var m = new T.Mesh(new T.BoxGeometry(w, h, d), mat); m.castShadow = true; return m; }
+    function ball(r, mat) { var m = new T.Mesh(new T.SphereGeometry(r, 16, 12), mat); m.castShadow = true; return m; }
+
+    /* ----- Gabe, modeled on his photo: curly strawberry-blond hair, gray #99 kit with neon trim ----- */
+    function buildGabe() {
+      var g = new T.Group(), skin = std(0xf0c4a2), kit = std(0xd4d7db), neon = std(0xd7f20f, { emissive: 0x2a3000 }), sock = std(0xf4f4f4), shoe = std(0xc9ccd1, { metalness: 0.5, roughness: 0.35 });
+      function leg(side) {
+        var L = new T.Group(); L.position.set(0.17 * side, 1.0, 0);
+        var shorts = box(0.3, 0.34, 0.32, kit); shorts.position.y = -0.1; L.add(shorts);
+        var thigh = box(0.2, 0.5, 0.2, skin); thigh.position.y = -0.48; L.add(thigh);
+        var s2 = box(0.21, 0.26, 0.21, sock); s2.position.y = -0.8; L.add(s2);
+        var sh = box(0.24, 0.14, 0.42, shoe); sh.position.set(0, -0.96, 0.08); L.add(sh);
+        return L;
+      }
+      g.legL = leg(-1); g.legR = leg(1); g.add(g.legL, g.legR);
+      var front = new T.MeshStandardMaterial({ map: jerseyTex(false), roughness: 0.8 }), back = new T.MeshStandardMaterial({ map: jerseyTex(true), roughness: 0.8 });
+      var torso = new T.Mesh(new T.BoxGeometry(0.64, 0.66, 0.36), [kit, kit, kit, kit, front, back]); torso.position.y = 1.36; torso.castShadow = true; g.add(torso);
+      function arm(side) {
+        var A = new T.Group(); A.position.set(0.41 * side, 1.62, 0);
+        var sl = box(0.2, 0.24, 0.22, neon); sl.position.y = -0.08; A.add(sl);
+        var a = box(0.15, 0.48, 0.15, skin); a.position.y = -0.42; A.add(a);
+        return A;
+      }
+      g.armL = arm(-1); g.armR = arm(1); g.add(g.armL, g.armR);
+      var neck = box(0.14, 0.12, 0.14, skin); neck.position.y = 1.74; g.add(neck);
+      var head = new T.Group(); head.position.y = 1.98; g.add(head); g.head = head;
+      var skull = ball(0.27, skin); head.add(skull);
+      var hairMat = std(0xc98a4e, { roughness: 0.95 });
+      for (var i = 0; i < 26; i++) {
+        var th = Math.random() * Math.PI * 2, ph = Math.random() * 1.15;
+        var r = 0.27, cx = Math.sin(ph) * Math.cos(th) * r, cz = Math.sin(ph) * Math.sin(th) * r, cy = Math.cos(ph) * r;
+        if (cz > 0.12 && cy < 0.12) continue; // keep the face clear
+        var c = ball(0.085 + Math.random() * 0.05, hairMat); c.position.set(cx, cy + 0.03, cz - 0.02); head.add(c);
+      }
+      var eyeM = std(0x1b1b1b); var e1 = ball(0.03, eyeM), e2 = ball(0.03, eyeM); e1.position.set(-0.09, 0.03, 0.25); e2.position.set(0.09, 0.03, 0.25); head.add(e1, e2); g.eyes = [e1, e2];
+      var smile = new T.Mesh(new T.TorusGeometry(0.07, 0.012, 6, 12, Math.PI), eyeM); smile.rotation.z = Math.PI; smile.position.set(0, -0.07, 0.25); head.add(smile); g.smile = smile;
+      faceMesh = new T.Mesh(new T.CircleGeometry(0.235, 24), new T.MeshBasicMaterial({ color: 0xffffff })); faceMesh.position.set(0, -0.01, 0.262); faceMesh.visible = false; head.add(faceMesh);
+      return g;
+    }
+    function applyFace() {
+      if (!faceMesh) return;
+      var url = null; try { url = localStorage.getItem(PHOTO_KEY); } catch (e) {}
+      $("dPhotoClear").hidden = !url;
+      if (!url) { faceMesh.visible = false; gabe.eyes.forEach(function (e) { e.visible = true; }); gabe.smile.visible = true; return; }
+      new T.TextureLoader().load(url, function (tex) {
+        faceMesh.material = new T.MeshBasicMaterial({ map: tex }); faceMesh.visible = true;
+        gabe.eyes.forEach(function (e) { e.visible = false; }); gabe.smile.visible = false;
+      });
+    }
+
+    /* ----- the dragon: an original red rival dragon ----- */
+    function buildDragon() {
+      var d = new T.Group(), scale = std(0x8f1d24, { roughness: 0.6 }), belly = std(0xd08a46), dark = std(0x4a0d12, { side: T.DoubleSide, roughness: 0.8 }), horn = std(0xe8dcc0);
+      d.flash = [];
+      var body = new T.Group(); d.add(body); d.body = body;
+      var segs = [];
+      for (var i = 0; i < 9; i++) {
+        var r = i < 3 ? 1.4 - i * 0.1 : Math.max(0.25, 1.2 - (i - 2) * 0.16);
+        var sgm = ball(r, i === 1 ? belly : scale); sgm.position.set(0, 0, -i * 1.15); body.add(sgm); segs.push(sgm); d.flash.push(sgm);
+        if (i < 7) { var spike = new T.Mesh(new T.ConeGeometry(0.18, 0.6, 6), horn); spike.position.set(0, r + 0.15, -i * 1.15); body.add(spike); }
+      }
+      d.segs = segs;
+      var neck = new T.Group(); neck.position.set(0, 0.3, 1.1); body.add(neck);
+      for (var n = 0; n < 3; n++) { var ns = ball(0.75 - n * 0.1, scale); ns.position.set(0, n * 0.35, n * 0.75); neck.add(ns); d.flash.push(ns); }
+      var head = new T.Group(); head.position.set(0, 1.15, 2.7); neck.add(head); d.head = head;
+      var skull = box(1.2, 0.9, 1.4, scale); head.add(skull); d.flash.push(skull);
+      var snout = box(0.8, 0.5, 1.0, scale); snout.position.set(0, -0.15, 1.1); head.add(snout); d.flash.push(snout);
+      var jaw = box(0.75, 0.2, 1.0, belly); jaw.position.set(0, -0.48, 0.95); head.add(jaw); d.jaw = jaw;
+      [-1, 1].forEach(function (s) {
+        var hn = new T.Mesh(new T.ConeGeometry(0.16, 1.1, 8), horn); hn.position.set(0.4 * s, 0.6, -0.5); hn.rotation.x = -0.9; head.add(hn);
+        var eye = new T.Mesh(new T.SphereGeometry(0.13, 10, 8), new T.MeshBasicMaterial({ color: 0xffc400 })); eye.position.set(0.45 * s, 0.15, 0.45); head.add(eye);
+      });
+      function wing(side) {
+        var geo = new T.BufferGeometry();
+        var v = new Float32Array([0, 0, 0, 7 * side, 1.5, -1, 0, 0, -3.5, 7 * side, 1.5, -1, 5 * side, -0.5, -4.5, 0, 0, -3.5, 7 * side, 1.5, -1, 9 * side, -1, -2.5, 5 * side, -0.5, -4.5]);
+        geo.setAttribute("position", new T.BufferAttribute(v, 3)); geo.computeVertexNormals();
+        var W = new T.Group(); W.position.set(0.8 * side, 0.6, 0.4);
+        var mem = new T.Mesh(geo, dark); mem.castShadow = true; W.add(mem);
+        var bone = box(0.15, 0.15, 7.2, scale); bone.position.set(3.5 * side, 0.75, -0.5); bone.rotation.y = Math.PI / 2 * side * 0.98; W.add(bone);
+        body.add(W); return W;
+      }
+      d.wingL = wing(-1); d.wingR = wing(1);
+      [-1, 1].forEach(function (s) { var lg = box(0.4, 1.2, 0.4, scale); lg.position.set(0.8 * s, -1.3, -1.6); body.add(lg); });
+      return d;
+    }
+
+    function init() {
+      T = window.THREE;
+      renderer = new T.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
+      wrap.insertBefore(renderer.domElement, wrap.firstChild);
+      scene = new T.Scene();
+      scene.background = new T.Color(0x0b1430); scene.fog = new T.Fog(0x0b1430, 70, 190);
+      camera = new T.PerspectiveCamera(60, 16 / 9, 0.1, 500);
+      scene.add(new T.HemisphereLight(0x9fbaff, 0x14301a, 0.75));
+      var sun = new T.DirectionalLight(0xffffff, 0.9); sun.position.set(25, 60, 30); sun.castShadow = true;
+      sun.shadow.mapSize.set(1024, 1024); var sc = sun.shadow.camera; sc.left = -60; sc.right = 60; sc.top = 45; sc.bottom = -45; sc.far = 160;
+      scene.add(sun);
+      // turf, field, goals, boards, light towers, stars
+      var turf = new T.Mesh(new T.PlaneGeometry(260, 200), std(0x1f4fd1, { roughness: 0.95 })); turf.rotation.x = -Math.PI / 2; turf.position.y = -0.02; turf.receiveShadow = true; scene.add(turf);
+      var field = new T.Mesh(new T.PlaneGeometry(104, 67), new T.MeshStandardMaterial({ map: fieldTex(), roughness: 0.95 })); field.rotation.x = -Math.PI / 2; field.receiveShadow = true; scene.add(field);
+      var white = std(0xffffff), net = new T.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.35 });
+      [-1, 1].forEach(function (s) {
+        var x = 51 * s;
+        [-3.66, 3.66].forEach(function (z) { var post = new T.Mesh(new T.CylinderGeometry(0.08, 0.08, 2.44, 8), white); post.position.set(x, 1.22, z); scene.add(post); });
+        var bar = new T.Mesh(new T.CylinderGeometry(0.08, 0.08, 7.32, 8), white); bar.rotation.x = Math.PI / 2; bar.position.set(x, 2.44, 0); scene.add(bar);
+        var nb = new T.Mesh(new T.BoxGeometry(2, 2.44, 7.32, 4, 4, 12), net); nb.position.set(x + 1 * s, 1.22, 0); scene.add(nb);
+      });
+      var bt = boardTex();
+      [-1, 1].forEach(function (s) { var b = new T.Mesh(new T.PlaneGeometry(100, 1.4), new T.MeshBasicMaterial({ map: bt })); b.position.set(0, 0.7, 37 * s); if (s > 0) b.rotation.y = Math.PI; scene.add(b); });
+      [[-58, -42], [58, -42], [-58, 42], [58, 42]].forEach(function (p) {
+        var pole = new T.Mesh(new T.CylinderGeometry(0.4, 0.6, 30, 8), std(0x777f8c)); pole.position.set(p[0], 15, p[1]); scene.add(pole);
+        var lamp = new T.Mesh(new T.BoxGeometry(5, 3, 1), new T.MeshBasicMaterial({ color: 0xfffbe6 })); lamp.position.set(p[0], 30, p[1]); lamp.lookAt(0, 0, 0); scene.add(lamp);
+      });
+      var sg = new T.BufferGeometry(), sp = [];
+      for (var i = 0; i < 700; i++) { var th = Math.random() * Math.PI * 2, ph = Math.random() * 1.2, R = 220; sp.push(Math.sin(ph) * Math.cos(th) * R, Math.cos(ph) * R * 0.6 + 40, Math.sin(ph) * Math.sin(th) * R); }
+      sg.setAttribute("position", new T.Float32BufferAttribute(sp, 3));
+      scene.add(new T.Points(sg, new T.PointsMaterial({ color: 0xffffff, size: 0.9, fog: false })));
+
+      gabe = buildGabe(); scene.add(gabe);
+      dragon = buildDragon(); scene.add(dragon);
+      ballGeo = new T.SphereGeometry(0.3, 16, 12); ballMat = new T.MeshStandardMaterial({ map: ballTex(), roughness: 0.5 });
+      fireGeo = new T.SphereGeometry(0.7, 12, 10); fireMat = new T.MeshBasicMaterial({ color: 0xff7a1a });
+      clock = new T.Clock();
+      applyFace();
+      bindControls();
+      ready = true;
+      resize();
+      reset(); st.mode = "ready";
+      showMsg('<h3>Gabe vs. the Dragon</h3><p>Kick soccer balls at the rival dragon until it falls. Dodge its fireballs. You have 5 hearts.</p><button type="button" class="btn" data-dstart>Start</button>');
+    }
+
+    function reset() {
+      if (st) { st.balls.forEach(function (b) { scene.remove(b.m); }); st.fires.forEach(function (f) { scene.remove(f.m); }); st.fx.forEach(function (f) { scene.remove(f.m); }); }
+      st = { mode: "run", t: 0, hp: 40, maxHp: 40, hearts: 5, inv: 0, kickCd: 0, kickAnim: 0, fireCd: 3, angle: 0, balls: [], fires: [], fx: [], fall: 0, won: false };
+      gabe.position.set(-20, 0, 0); gabe.vy = 0; gabe.rotation.set(0, 0, 0);
+      dragon.position.set(0, 14, 30); dragon.rotation.set(0, 0, 0);
+      updateHud();
+    }
+    function updateHud() {
+      $("dHp").style.width = Math.max(0, st.hp / st.maxHp * 100) + "%";
+      $("gHearts").textContent = "♥♥♥♥♥".slice(0, st.hearts) + "♡♡♡♡♡".slice(0, 5 - st.hearts);
+      $("dTime").textContent = fmt(st.t);
+    }
     function resize() {
-      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
-      if (!r.width) return;
-      cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
-      scale = cv.height / H; W = cv.width / scale;
-      draw();
+      if (!ready) return;
+      var w = wrap.clientWidth, h = wrap.clientHeight; if (!w || !h) return;
+      renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 1 ? 72 : 60; camera.updateProjectionMatrix();
     }
     window.addEventListener("resize", function () { if (visible) resize(); });
 
-    function jump() {
-      if (st.mode === "ready") { st.mode = "run"; }
-      if (st.mode === "over") { reset(); st.mode = "run"; return; }
-      if (st.mode === "paused") { st.mode = "run"; return; }
-      if (st.jumps < 2) { st.vy = st.jumps === 0 ? -760 : -640; st.jumps++; }
+    function bindControls() {
+      var map = { KeyW: "up", ArrowUp: "up", KeyS: "down", ArrowDown: "down", KeyA: "left", ArrowLeft: "left", KeyD: "right", ArrowRight: "right", Space: "kick", KeyK: "kick", ShiftLeft: "jump", ShiftRight: "jump", KeyJ: "jump" };
+      window.addEventListener("keydown", function (ev) {
+        if (!visible) return; var t = (ev.target && ev.target.tagName) || "";
+        if (t === "INPUT" || t === "SELECT" || t === "TEXTAREA") return;
+        var k = map[ev.code]; if (!k) return; ev.preventDefault();
+        if (st.mode !== "run" && (k === "kick" || k === "jump")) { start(); return; }
+        keys[k] = true;
+      });
+      window.addEventListener("keyup", function (ev) { var k = map[ev.code]; if (k) keys[k] = false; });
+      renderer.domElement.addEventListener("pointerdown", function (ev) { ev.preventDefault(); if (st.mode === "run") keys.kickTap = true; });
+      $("dPad").querySelectorAll("button").forEach(function (b) {
+        var k = b.dataset.k;
+        b.addEventListener("pointerdown", function (ev) { ev.preventDefault(); b.setPointerCapture && b.setPointerCapture(ev.pointerId); if (st.mode !== "run") { start(); return; } keys[k] = true; if (k === "kick") keys.kickTap = true; });
+        ["pointerup", "pointercancel", "pointerleave"].forEach(function (e) { b.addEventListener(e, function () { keys[k] = false; }); });
+      });
+      msgEl.addEventListener("click", function (ev) { if (ev.target.closest("[data-dstart]")) start(); });
+      document.addEventListener("visibilitychange", function () { if (document.hidden) keys = {}; });
     }
-    cv.addEventListener("pointerdown", function (ev) { ev.preventDefault(); cv.focus(); jump(); });
-    window.addEventListener("keydown", function (ev) {
-      if (!visible) return;
-      var tag = (ev.target && ev.target.tagName) || "";
-      if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
-      if (ev.code === "Space" || ev.code === "ArrowUp" || ev.code === "KeyW") { ev.preventDefault(); jump(); }
-      else if (ev.code === "KeyP" && (st.mode === "run" || st.mode === "paused")) { st.mode = st.mode === "run" ? "paused" : "run"; draw(); }
-    });
-    document.addEventListener("visibilitychange", function () { if (document.hidden && st.mode === "run") { st.mode = "paused"; draw(); } });
+    function start() { if (st.mode === "won" || st.mode === "lost") reset(); st.mode = "run"; hideMsg(); keys = {}; clock.getDelta(); }
 
-    function rand(a, b) { return a + Math.random() * (b - a); }
+    function kick() {
+      var foot = new T.Vector3(0, 0.4, 0.5).applyEuler(gabe.rotation).add(gabe.position);
+      var m = new T.Mesh(ballGeo, ballMat); m.castShadow = true; m.position.copy(foot); scene.add(m);
+      var target = dragon.position.clone(), dir = target.sub(foot).normalize();
+      st.balls.push({ m: m, v: dir.multiplyScalar(34).add(new T.Vector3(0, 4, 0)), life: 3 });
+      st.kickAnim = 0.25;
+    }
+    function shootFire() {
+      var mouth = new T.Vector3(); dragon.head.getWorldPosition(mouth);
+      var spread = st.hp <= st.maxHp / 2 ? [-1, 0, 1] : [0];
+      spread.forEach(function (s) {
+        var target = gabe.position.clone().add(new T.Vector3(s * 3, 0.8, s * 3));
+        var m = new T.Mesh(fireGeo, fireMat); m.position.copy(mouth); scene.add(m);
+        st.fires.push({ m: m, v: target.sub(mouth).normalize().multiplyScalar(st.hp <= st.maxHp / 2 ? 24 : 19), life: 5 });
+      });
+      dragon.jaw.rotation.x = 0.5;
+    }
+    function burst(pos, color, n, size) {
+      for (var i = 0; i < n; i++) {
+        var m = new T.Mesh(new T.SphereGeometry(size || 0.18, 6, 5), new T.MeshBasicMaterial({ color: color, transparent: true }));
+        m.position.copy(pos); scene.add(m);
+        st.fx.push({ m: m, v: new T.Vector3((Math.random() - .5) * 14, Math.random() * 10, (Math.random() - .5) * 14), life: 0.8 + Math.random() * 0.5 });
+      }
+    }
+
     function update(dt) {
+      var time = clock.elapsedTime;
+      // dragon idle animation always
+      var flap = Math.sin(time * (st.hp <= st.maxHp / 2 ? 7 : 5));
+      dragon.wingL.rotation.z = flap * 0.55; dragon.wingR.rotation.z = -flap * 0.55;
+      dragon.segs.forEach(function (sg, i) { sg.position.x = Math.sin(time * 3 - i * 0.6) * 0.18 * i; });
+      dragon.jaw.rotation.x *= 0.9;
+      if (st.mode === "won") {
+        st.fall += dt;
+        if (dragon.position.y > 1.5) { dragon.position.y -= dt * (6 + st.fall * 8); dragon.rotation.z += dt * 2; }
+        st.fx.forEach(stepFx(dt)); st.fx = st.fx.filter(function (f) { return f.life > 0; });
+        gabe.position.y = Math.abs(Math.sin(time * 6)) * 0.6; gabe.armL.rotation.x = gabe.armR.rotation.x = -2.8;
+        if (Math.random() < 0.3) burst(new T.Vector3(gabe.position.x + (Math.random() - .5) * 8, 8, gabe.position.z + (Math.random() - .5) * 8), Math.random() < .5 ? 0xfcdb04 : 0x16478e, 2, 0.15);
+        return;
+      }
       if (st.mode !== "run") return;
       st.t += dt;
-      st.speed = Math.min(780, 330 + st.t * 9);
-      var dx = st.speed * dt;
-      st.dist += dx; st.scroll += dx;
-      st.score = Math.floor(st.dist / 10) + st.ap * 25 + st.letters.length * 100;
-      // Gabe
-      st.vy += 2300 * dt; st.y += st.vy * dt;
-      if (st.y >= GROUND) { st.y = GROUND; st.vy = 0; st.jumps = 0; }
-      // spawn obstacles
-      st.nextObs -= dt;
-      if (st.nextObs <= 0) {
-        var keys = st.t > 12 ? ["homework", "sign", "backpack", "cart"] : ["homework", "sign", "backpack"];
-        var k = keys[Math.floor(Math.random() * keys.length)];
-        st.obs.push({ k: k, x: W + 40, w: OBST[k].w, h: OBST[k].h, hue: Math.floor(rand(0, 4)) });
-        st.nextObs = rand(0.85, 1.7) * (420 / st.speed) + 0.35;
-      }
-      // spawn pickups
-      st.nextItem -= dt;
-      if (st.nextItem <= 0) {
-        var r = Math.random(), kind = r < 0.08 ? "letter" : r < 0.4 ? "ap" : "aplus";
-        var hgt = rand(70, 165), n = kind === "aplus" ? 3 : 1;
-        for (var i = 0; i < n; i++) st.items.push({ kind: kind, x: W + 40 + i * 34, y: GROUND - hgt - Math.sin(i / 2 * Math.PI) * 14, got: false });
-        st.nextItem = rand(0.9, 2.0);
-      }
-      var px0 = 96 - 14, px1 = 96 + 14, py0 = st.y - 116, py1 = st.y - 4; // Gabe is drawn 1.35x size
-      st.obs.forEach(function (o) { o.x -= dx; });
-      st.obs = st.obs.filter(function (o) { return o.x + o.w > -20; });
-      for (var j = 0; j < st.obs.length; j++) {
-        var o = st.obs[j], ox0 = o.x + 4, ox1 = o.x + o.w - 4, oy0 = GROUND - o.h + 4;
-        if (px1 > ox0 && px0 < ox1 && py1 > oy0) { gameOver(OBST[o.k].label); return; }
-      }
-      st.items.forEach(function (it) {
-        it.x -= dx;
-        if (!it.got && Math.abs(it.x - 96) < 26 && it.y > py0 - 14 && it.y < py1 + 6) {
-          it.got = true;
-          if (it.kind === "aplus") { st.dist += 100; pop("+10 A+", it.x, it.y, "#1d7a4b"); }
-          else if (it.kind === "ap") { st.ap++; pop("+25 AP credit", it.x, it.y, "#b38f00"); }
-          else {
-            var name = COLLEGES[Math.floor(Math.random() * COLLEGES.length)];
-            if (st.letters.indexOf(name) < 0) st.letters.push(name);
-            pop("Accepted: " + name + "!", it.x, it.y, "#16478e");
-          }
+      // Gabe movement relative to the dragon (lock-on)
+      var toD = new T.Vector3(dragon.position.x - gabe.position.x, 0, dragon.position.z - gabe.position.z).normalize();
+      var side = new T.Vector3(toD.z, 0, -toD.x);
+      var mv = new T.Vector3();
+      if (keys.up) mv.add(toD); if (keys.down) mv.sub(toD); if (keys.left) mv.add(side); if (keys.right) mv.sub(side);
+      var moving = mv.lengthSq() > 0;
+      if (moving) { mv.normalize().multiplyScalar(11 * dt); gabe.position.add(mv); }
+      gabe.position.x = clamp(gabe.position.x, -50, 50); gabe.position.z = clamp(gabe.position.z, -32, 32);
+      var face = moving ? mv : toD, want = Math.atan2(face.x, face.z), cur = gabe.rotation.y, dA = Math.atan2(Math.sin(want - cur), Math.cos(want - cur));
+      gabe.rotation.y = cur + dA * Math.min(1, dt * 12);
+      // jump
+      if (keys.jump && gabe.position.y <= 0.001) gabe.vy = 9;
+      gabe.vy = (gabe.vy || 0) - 25 * dt; gabe.position.y = Math.max(0, gabe.position.y + gabe.vy * dt); if (gabe.position.y === 0) gabe.vy = 0;
+      // run animation
+      var sw = moving && gabe.position.y === 0 ? Math.sin(st.t * 14) * 0.8 : 0;
+      gabe.legL.rotation.x = sw; gabe.legR.rotation.x = -sw; gabe.armL.rotation.x = -sw * 0.8; gabe.armR.rotation.x = sw * 0.8;
+      if (st.kickAnim > 0) { st.kickAnim -= dt; gabe.legR.rotation.x = -1.4 * Math.sin((0.25 - st.kickAnim) / 0.25 * Math.PI); }
+      // kick
+      st.kickCd -= dt;
+      if ((keys.kick || keys.kickTap) && st.kickCd <= 0) { kick(); st.kickCd = 0.45; }
+      keys.kickTap = false;
+      // dragon flight: circle the field, lower and faster when hurt
+      var angry = st.hp <= st.maxHp / 2;
+      st.angle += dt * (angry ? 0.42 : 0.3);
+      var R = angry ? 24 : 30, alt = (angry ? 10 : 14) + Math.sin(st.t * 1.3) * 2;
+      var nx = Math.cos(st.angle) * R, nz = Math.sin(st.angle) * R * 0.8;
+      var heading = Math.atan2(nx - dragon.position.x, nz - dragon.position.z);
+      dragon.position.set(nx, alt, nz); dragon.rotation.y = heading; dragon.rotation.z = -0.25;
+      var look = new T.Vector3(); dragon.head.lookAt(gabe.position.x, gabe.position.y + 1, gabe.position.z);
+      // fireballs
+      st.fireCd -= dt; if (st.fireCd <= 0) { shootFire(); st.fireCd = angry ? 1.6 : 2.6; }
+      // balls
+      st.balls.forEach(function (b) {
+        var aim = dragon.position.clone().sub(b.m.position).normalize().multiplyScalar(34);
+        b.v.lerp(aim, Math.min(1, dt * 1.6)); b.v.y -= 6 * dt;
+        b.m.position.addScaledVector(b.v, dt); b.m.rotation.x += dt * 12; b.life -= dt;
+        if (b.m.position.distanceTo(dragon.position) < 3.3 || b.m.position.distanceTo(new T.Vector3().setFromMatrixPosition(dragon.head.matrixWorld)) < 1.8) {
+          b.life = 0; st.hp -= 1; burst(b.m.position, 0xffd27a, 8);
+          dragon.flash.forEach(function (m) { m.material.emissive && m.material.emissive.setHex(0x661111); });
+          st.flashT = 0.12;
+          if (st.hp <= 0) { win(); }
         }
+        if (b.m.position.y < 0.3) { b.m.position.y = 0.3; b.v.y = Math.abs(b.v.y) * 0.5; b.v.multiplyScalar(0.7); }
       });
-      st.items = st.items.filter(function (it) { return it.x > -30 && !it.got; });
-      st.pops.forEach(function (q) { q.y -= 40 * dt; q.life -= dt; });
-      st.pops = st.pops.filter(function (q) { return q.life > 0; });
+      if (st.flashT != null) { st.flashT -= dt; if (st.flashT <= 0) { dragon.flash.forEach(function (m) { m.material.emissive && m.material.emissive.setHex(0x000000); }); st.flashT = null; } }
+      st.balls = st.balls.filter(function (b) { if (b.life <= 0) scene.remove(b.m); return b.life > 0; });
+      // fireballs
+      st.inv -= dt;
+      gabe.visible = st.inv > 0 ? Math.floor(st.inv * 12) % 2 === 0 : true;
+      var gc = gabe.position.clone().add(new T.Vector3(0, 1.2, 0));
+      st.fires.forEach(function (f) {
+        f.m.position.addScaledVector(f.v, dt); f.life -= dt; f.m.scale.setScalar(1 + Math.sin(st.t * 30) * 0.12);
+        if (f.m.position.distanceTo(gc) < 1.3 && st.inv <= 0 && st.mode === "run") {
+          f.life = 0; st.hearts -= 1; st.inv = 1.3; burst(f.m.position, 0xff7a1a, 12);
+          if (st.hearts <= 0) lose();
+        }
+        if (f.m.position.y <= 0.4) { f.life = 0; burst(f.m.position, 0xff9a3a, 6, 0.25); }
+      });
+      st.fires = st.fires.filter(function (f) { if (f.life <= 0) scene.remove(f.m); return f.life > 0; });
+      st.fx.forEach(stepFx(dt)); st.fx = st.fx.filter(function (f) { return f.life > 0; });
+      updateHud();
     }
-    function pop(text, x, y, color) { st.pops.push({ text: text, x: x, y: y, color: color, life: 1.2 }); }
-    function gameOver(cause) {
-      st.mode = "over"; st.cause = cause;
-      if (st.score > best) { best = st.score; try { localStorage.setItem(BEST_KEY, String(best)); } catch (e) {} }
+    function stepFx(dt) {
+      return function (f) {
+        f.v.y -= 18 * dt; f.m.position.addScaledVector(f.v, dt); f.life -= dt;
+        f.m.material.opacity = Math.max(0, f.life); if (f.life <= 0) scene.remove(f.m);
+      };
+    }
+    function win() {
+      st.mode = "won"; st.won = true; updateHud();
+      burst(dragon.position, 0xfcdb04, 40, 0.3);
+      var newBest = !best || st.t < best; if (newBest) { best = st.t; try { localStorage.setItem(BEST_KEY, String(best)); } catch (e) {} }
+      setTimeout(function () {
+        showMsg('<h3>Gabe wins!</h3><p>#99 knocked the rival dragon out of the sky in <b>' + fmt(st.t) + "</b>. The bell stays at Greenfield-Central. 🔔</p><p>" +
+          (newBest ? "New best time!" : "Best time: " + fmt(best)) + '</p><button type="button" class="btn" data-dstart>Play again</button>');
+      }, 1600);
+    }
+    function lose() {
+      st.mode = "lost"; updateHud();
+      showMsg('<h3>Red card!</h3><p>The dragon got Gabe this time. It had <b>' + st.hp + "</b> of " + st.maxHp + ' health left.</p><button type="button" class="btn" data-dstart>Try again</button>');
     }
 
-    /* ----- drawing ----- */
-    function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
-    function text(t, x, y, size, color, align, weight) {
-      ctx.font = (weight || "800") + " " + size + "px 'Barlow Condensed', 'Arial Narrow', sans-serif";
-      ctx.fillStyle = color; ctx.textAlign = align || "left"; ctx.fillText(t, x, y);
-    }
-    function background() {
-      ctx.fillStyle = "#dfe6f1"; ctx.fillRect(0, 0, W, H);
-      // ceiling lights
-      ctx.fillStyle = "#f7f9fc";
-      var off = -(st.scroll * 0.3) % 220;
-      for (var x = off - 220; x < W + 220; x += 220) { rr(x + 40, 14, 120, 10, 4); ctx.fill(); }
-      // banners
-      var boff = -(st.scroll * 0.5) % 900;
-      for (var bx = boff - 900; bx < W + 900; bx += 900) {
-        ctx.fillStyle = "#16478e"; rr(bx + 300, 46, 200, 42, 6); ctx.fill();
-        text("GO COUGARS", bx + 400, 76, 26, "#fcdb04", "center");
-      }
-      // lockers
-      var loff = -(st.scroll * 0.5) % 46;
-      for (var lx = loff - 46; lx < W + 46; lx += 46) {
-        ctx.fillStyle = "#1f56a6"; ctx.fillRect(lx, 108, 44, GROUND - 108);
-        ctx.fillStyle = "#16478e"; ctx.fillRect(lx + 42, 108, 4, GROUND - 108);
-        ctx.fillStyle = "rgba(255,255,255,.25)";
-        for (var v = 0; v < 3; v++) ctx.fillRect(lx + 10, 122 + v * 6, 24, 2);
-        ctx.fillStyle = "#c9d6ea"; ctx.fillRect(lx + 34, 196, 4, 16);
-      }
-      // floor
-      ctx.fillStyle = "#cdb98f"; ctx.fillRect(0, GROUND, W, H - GROUND);
-      ctx.fillStyle = "#b9a378"; ctx.fillRect(0, GROUND, W, 4);
-      var foff = -st.scroll % 80;
-      ctx.fillStyle = "rgba(0,0,0,.08)";
-      for (var fx = foff; fx < W; fx += 80) ctx.fillRect(fx, GROUND + 4, 2, H - GROUND);
-    }
-    function drawObstacle(o) {
-      var x = o.x, y = GROUND;
-      if (o.k === "homework") {
-        for (var i = 0; i < 5; i++) { ctx.fillStyle = i % 2 ? "#ffffff" : "#eef2f7"; ctx.fillRect(x + (i % 2) * 2, y - 6 - i * 6, o.w - 2, 6); ctx.fillStyle = "#9fb3d6"; ctx.fillRect(x + 4 + (i % 2) * 2, y - 3 - i * 6, o.w - 12, 1); }
-        text("HW", x + o.w / 2, y - o.h - 2, 12, "#b23a3a", "center");
-      } else if (o.k === "sign") {
-        ctx.fillStyle = "#f2c200"; ctx.beginPath(); ctx.moveTo(x + o.w / 2, y - o.h); ctx.lineTo(x + o.w, y); ctx.lineTo(x, y); ctx.closePath(); ctx.fill();
-        ctx.strokeStyle = "#1b1b1b"; ctx.lineWidth = 1.5; ctx.stroke();
-        text("!", x + o.w / 2, y - 10, 18, "#1b1b1b", "center");
-      } else if (o.k === "backpack") {
-        var colors = ["#b23a3a", "#1d7a4b", "#6b3fa0", "#e07a1f"];
-        ctx.fillStyle = colors[o.hue]; rr(x, y - o.h, o.w, o.h, 8); ctx.fill();
-        ctx.fillStyle = "rgba(0,0,0,.18)"; rr(x + 6, y - 14, o.w - 12, 10, 3); ctx.fill();
-      } else {
-        ctx.fillStyle = "#4a5568"; ctx.fillRect(x, y - o.h, o.w, 6); ctx.fillRect(x, y - 16, o.w, 4);
-        ctx.fillRect(x + 2, y - o.h, 4, o.h - 6); ctx.fillRect(x + o.w - 6, y - o.h, 4, o.h - 6);
-        ctx.fillStyle = "#1b1b1b"; ctx.fillRect(x + 12, y - o.h - 20, 30, 20);
-        ctx.fillStyle = "#9fb3d6"; ctx.fillRect(x + 14, y - o.h - 18, 26, 14);
-        ctx.fillStyle = "#222"; ctx.beginPath(); ctx.arc(x + 8, y - 3, 3, 0, 7); ctx.arc(x + o.w - 8, y - 3, 3, 0, 7); ctx.fill();
-      }
-    }
-    function drawItem(it) {
-      if (it.kind === "aplus") {
-        ctx.fillStyle = "#fff"; rr(it.x - 10, it.y - 12, 20, 24, 2); ctx.fill(); ctx.strokeStyle = "#cfd8e6"; ctx.lineWidth = 1; ctx.stroke();
-        text("A+", it.x, it.y + 5, 13, "#1d7a4b", "center");
-      } else if (it.kind === "ap") {
-        ctx.fillStyle = "#fcdb04"; ctx.beginPath();
-        for (var i = 0; i < 10; i++) { var a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 6 : 14; ctx.lineTo(it.x + Math.cos(a) * r, it.y + Math.sin(a) * r); }
-        ctx.closePath(); ctx.fill(); ctx.strokeStyle = "#b38f00"; ctx.lineWidth = 1.5; ctx.stroke();
-        text("AP", it.x, it.y + 4, 9, "#5a4300", "center");
-      } else {
-        var bob = Math.sin(st.t * 6) * 3;
-        ctx.fillStyle = "#fffdf5"; rr(it.x - 16, it.y - 11 + bob, 32, 22, 3); ctx.fill(); ctx.strokeStyle = "#16478e"; ctx.lineWidth = 2; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(it.x - 16, it.y - 11 + bob); ctx.lineTo(it.x, it.y + 2 + bob); ctx.lineTo(it.x + 16, it.y - 11 + bob); ctx.stroke();
-        ctx.fillStyle = "#b23a3a"; ctx.beginPath(); ctx.arc(it.x, it.y + 2 + bob, 3.5, 0, 7); ctx.fill();
-      }
-    }
-    function drawGabe(x, feet, t, air) {
-      var stride = air ? 0 : Math.sin(t * 16), hipY = feet - 34, shoulderY = feet - 62;
-      ctx.lineCap = "round";
-      // legs
-      [[1, "#24365c"], [-1, "#2b3f66"]].forEach(function (L) {
-        var sw = air ? (L[0] > 0 ? -0.6 : 0.5) : stride * 0.7 * L[0];
-        var kx = x + Math.sin(sw) * 16, ky = hipY + Math.cos(sw) * 16;
-        var fx = kx + Math.sin(sw - (air ? 0.9 : Math.max(0, -sw) * 1.2)) * 17, fy = ky + Math.cos(sw - (air ? 0.9 : 0)) * 17;
-        ctx.strokeStyle = L[1]; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(x, hipY); ctx.lineTo(kx, ky); ctx.lineTo(fx, Math.min(fy, feet - 3)); ctx.stroke();
-        ctx.fillStyle = "#f5f5f5"; rr(fx - 5, Math.min(fy, feet - 3) - 3, 14, 7, 3); ctx.fill();
-        ctx.fillStyle = "#16478e"; ctx.fillRect(fx - 4, Math.min(fy, feet - 3) + 2, 12, 2);
-      });
-      // back arm
-      var as = air ? -1.4 : -stride * 0.8;
-      ctx.strokeStyle = shade(look.shirt, -0.2); ctx.lineWidth = 7;
-      ctx.beginPath(); ctx.moveTo(x, shoulderY + 4); ctx.lineTo(x + Math.sin(as) * 18, shoulderY + 4 + Math.cos(as) * 18); ctx.stroke();
-      // hoodie
-      ctx.fillStyle = look.shirt; rr(x - 13, shoulderY - 2, 26, 34, 8); ctx.fill();
-      ctx.fillStyle = shade(look.shirt, -0.15); ctx.fillRect(x - 13, hipY - 6, 26, 6);
-      text("GC", x, shoulderY + 20, 13, look.shirt === "#e3bf00" ? "#16478e" : "#fcdb04", "center");
-      // front arm
-      var af = air ? -1.6 : stride * 0.8;
-      ctx.strokeStyle = shade(look.shirt, 0.06); ctx.lineWidth = 7;
-      var hx = x + Math.sin(af) * 18, hy = shoulderY + 4 + Math.cos(af) * 18;
-      ctx.beginPath(); ctx.moveTo(x, shoulderY + 4); ctx.lineTo(hx, hy); ctx.stroke();
-      ctx.fillStyle = look.skin; ctx.beginPath(); ctx.arc(hx, hy, 4, 0, 7); ctx.fill();
-      // head
-      var hcx = x + 1, hcy = shoulderY - 16, R = 15;
-      ctx.fillStyle = look.skin; ctx.fillRect(hcx - 4, shoulderY - 6, 8, 6);
-      if (photo) {
-        ctx.save(); ctx.beginPath(); ctx.arc(hcx, hcy, R, 0, 7); ctx.clip();
-        var s = Math.min(photo.width, photo.height);
-        ctx.drawImage(photo, (photo.width - s) / 2, (photo.height - s) / 2, s, s, hcx - R, hcy - R, R * 2, R * 2);
-        ctx.restore();
-        ctx.strokeStyle = "#16478e"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(hcx, hcy, R, 0, 7); ctx.stroke();
-      } else {
-        ctx.fillStyle = look.skin; ctx.beginPath(); ctx.arc(hcx, hcy, R, 0, 7); ctx.fill();
-        ctx.fillStyle = shade(look.skin, -0.12); ctx.beginPath(); ctx.arc(hcx - 13, hcy + 2, 3.5, 0, 7); ctx.fill();
-        hair(hcx, hcy, R);
-        ctx.fillStyle = "#1b1b1b"; ctx.beginPath(); ctx.arc(hcx + 5, hcy - 1, 2, 0, 7); ctx.arc(hcx + 11, hcy - 1, 2, 0, 7); ctx.fill();
-        ctx.strokeStyle = "#1b1b1b"; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(hcx + 8, hcy + 4, 5, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
-      }
-      if (st.mode === "over") { text("✶", hcx + 18, hcy - 14, 16, "#fcdb04", "center"); text("✶", hcx - 16, hcy - 20, 12, "#fcdb04", "center"); }
-    }
-    function hair(cx, cy, R) {
-      ctx.fillStyle = look.hair;
-      if (look.style === "buzz") { ctx.beginPath(); ctx.arc(cx, cy, R + 1, Math.PI * 1.02, Math.PI * 1.98); ctx.lineTo(cx + R - 4, cy - 6); ctx.lineTo(cx - R, cy - 2); ctx.closePath(); ctx.globalAlpha = 0.85; ctx.fill(); ctx.globalAlpha = 1; }
-      else if (look.style === "curly") { for (var i = 0; i < 8; i++) { var a = Math.PI * (1.05 + i * 0.13); ctx.beginPath(); ctx.arc(cx + Math.cos(a) * (R - 1), cy + Math.sin(a) * (R - 1), 6, 0, 7); ctx.fill(); } }
-      else if (look.style === "long") { ctx.beginPath(); ctx.arc(cx, cy - 1, R + 2, Math.PI, Math.PI * 2); ctx.fill(); ctx.fillRect(cx - R - 2, cy - 2, 9, R + 8); }
-      else if (look.style === "cap") {
-        ctx.fillStyle = "#16478e"; ctx.beginPath(); ctx.arc(cx, cy - 2, R + 1, Math.PI, Math.PI * 2); ctx.fill();
-        ctx.fillRect(cx - R - 9, cy - 5, 12, 4); ctx.fillStyle = "#fcdb04"; ctx.fillRect(cx - 2, cy - 15, 6, 3);
-        ctx.fillStyle = look.hair; ctx.fillRect(cx + R - 6, cy - 4, 6, 6);
-      }
-      else { ctx.beginPath(); ctx.arc(cx, cy - 2, R + 1, Math.PI * 0.98, Math.PI * 2.02); ctx.lineTo(cx + R - 2, cy - 3); ctx.quadraticCurveTo(cx + 4, cy - 10, cx - R + 2, cy - 1); ctx.closePath(); ctx.fill(); }
-    }
-    function shade(hex, amt) {
-      var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
-      function f(c) { return Math.max(0, Math.min(255, Math.round(amt < 0 ? c * (1 + amt) : c + (255 - c) * amt))); }
-      return "rgb(" + f(r) + "," + f(g) + "," + f(b) + ")";
-    }
-    function hud() {
-      ctx.fillStyle = "rgba(14,49,104,.88)"; rr(10, 10, 210, 34, 8); ctx.fill();
-      text("SCORE " + st.score, 22, 35, 22, "#fff");
-      text("BEST " + best, 212, 35, 16, "#fcdb04", "right", "700");
-      if (st.letters.length) { ctx.fillStyle = "rgba(14,49,104,.88)"; rr(W - 170, 10, 160, 34, 8); ctx.fill(); text("✉ " + st.letters.length + " acceptance" + (st.letters.length > 1 ? "s" : ""), W - 90, 33, 18, "#fcdb04", "center"); }
-    }
-    function card(lines) {
-      var w = Math.min(W - 40, 460), h = 34 + lines.length * 30, x = (W - w) / 2, y = (H - h) / 2 - 20;
-      ctx.fillStyle = "rgba(14,49,104,.94)"; rr(x, y, w, h, 12); ctx.fill();
-      ctx.strokeStyle = "#fcdb04"; ctx.lineWidth = 3; ctx.stroke();
-      lines.forEach(function (l, i) { text(l[0], W / 2, y + 40 + i * 30, l[1], l[2], "center", l[3]); });
-    }
-    function draw() {
-      if (!cv.width) return;
-      ctx.setTransform(scale, 0, 0, scale, 0, 0);
-      background();
-      st.obs.forEach(drawObstacle);
-      st.items.forEach(drawItem);
-      ctx.save(); ctx.translate(96, st.y); ctx.scale(1.35, 1.35);
-      drawGabe(0, 0, st.t, st.y < GROUND - 1);
-      ctx.restore();
-      st.pops.forEach(function (q) { ctx.globalAlpha = Math.min(1, q.life * 1.5); text(q.text, q.x, q.y, 16, q.color, "center"); ctx.globalAlpha = 1; });
-      hud();
-      if (st.mode === "ready") card([["GABE'S GRADUATION RUN", 30, "#fcdb04"], ["Tap or press Space to start", 18, "#fff", "600"], ["Jump the homework · grab AP credits · catch acceptance letters", 14, "#cfdcf3", "500"]]);
-      if (st.mode === "paused") card([["PAUSED", 30, "#fcdb04"], ["Tap or press P to keep running", 18, "#fff", "600"]]);
-      if (st.mode === "over") {
-        var acc = st.letters.length ? "Accepted to " + st.letters.slice(0, 3).join(", ") + (st.letters.length > 3 ? " +" + (st.letters.length - 3) + " more" : "") : "No acceptance letters this run";
-        card([["TARDY!", 32, "#fcdb04"], ["Gabe tripped over " + st.cause + ".", 18, "#fff", "600"],
-          ["Score " + st.score + (st.score >= best && st.score > 0 ? " · New best!" : " · Best " + best), 20, "#fff"],
-          [acc, 15, "#cfdcf3", "500"], ["Tap or press Space to run again", 16, "#fcdb04", "600"]]);
-      }
-    }
-    function frame(ts) {
+    var camPos = null;
+    function frame() {
       if (!visible) return;
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      if (Math.abs(cv.width - Math.round(cv.clientWidth * dpr)) > 1 || Math.abs(cv.height - Math.round(cv.clientHeight * dpr)) > 1) resize();
-      var dt = Math.min(0.033, (ts - (last || ts)) / 1000); last = ts;
-      update(dt); draw();
+      var dt = Math.min(0.05, clock.getDelta());
+      if (wrap.clientWidth && Math.abs(renderer.domElement.width - Math.round(wrap.clientWidth * renderer.getPixelRatio())) > 2) resize();
+      update(dt);
+      // camera: behind Gabe, looking toward the dragon
+      var toD = new T.Vector3(dragon.position.x - gabe.position.x, 0, dragon.position.z - gabe.position.z).normalize();
+      var want = gabe.position.clone().addScaledVector(toD, -7.5).add(new T.Vector3(0, 2.4, 0));
+      if (!camPos) camPos = want.clone(); camPos.lerp(want, Math.min(1, dt * 4));
+      camera.position.copy(camPos);
+      var lookAt = gabe.position.clone().add(new T.Vector3(0, 2.2, 0)).lerp(dragon.position, 0.2);
+      lookAt.y = Math.min(lookAt.y, gabe.position.y + 6); // keep Gabe in frame while the dragon flies high
+      camera.lookAt(lookAt);
+      renderer.render(scene, camera);
       raf = requestAnimationFrame(frame);
     }
 
-    /* ----- look + photo ----- */
-    function saveLook() { try { localStorage.setItem(LOOK_KEY, JSON.stringify(look)); } catch (e) {} draw(); }
-    [["gSkin", "skin"], ["gHair", "hair"], ["gStyle", "style"], ["gShirt", "shirt"]].forEach(function (pair) {
-      $(pair[0]).addEventListener("change", function () { look[pair[1]] = this.value; saveLook(); });
-    });
-    function showPhotoState() { $("gPhotoClear").hidden = !photo; }
-    $("gPhoto").addEventListener("change", function () {
+    /* ----- face photo (stays on this device) ----- */
+    $("dPhoto").addEventListener("change", function () {
       var f = this.files && this.files[0]; if (!f) return;
       var rd = new FileReader();
       rd.onload = function () {
         var src = new Image();
         src.onload = function () {
-          // Shrink to a small square so it fits in this browser's storage.
-          var c2 = document.createElement("canvas"), sz = 200, s = Math.min(src.width, src.height);
+          var c2 = document.createElement("canvas"), sz = 256, s2 = Math.min(src.width, src.height);
           c2.width = sz; c2.height = sz;
-          c2.getContext("2d").drawImage(src, (src.width - s) / 2, (src.height - s) / 2, s, s, 0, 0, sz, sz);
-          var url = c2.toDataURL("image/jpeg", 0.85), im2 = new Image();
-          im2.onload = function () { photo = im2; showPhotoState(); draw(); };
-          im2.src = url;
-          try { localStorage.setItem(PHOTO_KEY, url); } catch (e) {}
+          // Center on the upper part of the photo, where a face usually is.
+          c2.getContext("2d").drawImage(src, (src.width - s2) / 2, Math.max(0, (src.height - s2) * 0.15), s2, s2, 0, 0, sz, sz);
+          try { localStorage.setItem(PHOTO_KEY, c2.toDataURL("image/jpeg", 0.85)); } catch (e) {}
+          if (ready) applyFace(); else $("dPhotoClear").hidden = false;
         };
         src.src = rd.result;
       };
-      rd.readAsDataURL(f);
-      this.value = "";
+      rd.readAsDataURL(f); this.value = "";
     });
-    $("gPhotoClear").addEventListener("click", function () { photo = null; try { localStorage.removeItem(PHOTO_KEY); } catch (e) {} showPhotoState(); draw(); });
-    showPhotoState();
+    $("dPhotoClear").addEventListener("click", function () { try { localStorage.removeItem(PHOTO_KEY); } catch (e) {} if (ready) applyFace(); else this.hidden = true; });
+    try { $("dPhotoClear").hidden = !localStorage.getItem(PHOTO_KEY); } catch (e) {}
 
     return {
-      show: function () { if (visible) return; visible = true; resize(); last = 0; raf = requestAnimationFrame(frame); },
-      hide: function () { if (!visible) return; visible = false; cancelAnimationFrame(raf); if (st.mode === "run") st.mode = "paused"; }
+      show: function () {
+        if (visible) return; visible = true;
+        loadThree(function () {
+          if (!visible) return;
+          if (!ready) init(); else { resize(); if (st.mode === "run") { st.mode = "paused"; showMsg('<h3>Paused</h3><button type="button" class="btn" data-dstart>Keep playing</button>'); } }
+          clock.getDelta(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
+        });
+      },
+      hide: function () { visible = false; cancelAnimationFrame(raf); keys = {}; }
     };
   })();
 
   /* ---------- Routing ---------- */
-  var VIEWS = ["courses", "activities", "sports", "grades", "about", "seal", "chances", "guide", "game"];
+  var VIEWS = ["courses", "activities", "sports", "grades", "about", "seal", "chances", "guide", "secret"];
   function route() {
     var v = (location.hash || "").slice(1);
     if (VIEWS.indexOf(v) < 0) v = "courses";
     if (v === "sports" || v === "about" || v === "seal") { S.seen[v] = true; save(); }
     if (v !== "chances" && ui.open) closeCollege();
-    if (v === "game") GAME.show(); else GAME.hide();
+    if (v === "secret" && !unlocked) { v = "guide"; }
+    if (v === "secret") DRAGON.show(); else DRAGON.hide();
     document.querySelectorAll("[data-view]").forEach(function (s) { s.hidden = s.dataset.view !== v; });
     document.querySelectorAll("[data-nav]").forEach(function (a) { if (a.dataset.nav === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     var a = document.querySelector('[data-nav="' + v + '"]');
