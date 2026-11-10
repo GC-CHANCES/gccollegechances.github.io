@@ -323,6 +323,23 @@ button.crow:hover { background: var(--soft); }
 .facts2 div { display: flex; flex-direction: column; }
 .facts2 dt { font-size: 13px; color: var(--muted); }
 .facts2 dd { margin: 0; font-weight: 600; }
+.chartwrap svg { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: manipulation; user-select: none; }
+.hc { stroke: none; }
+.hc.likely { fill: var(--likely); } .hc.target { fill: var(--target); } .hc.reach { fill: var(--reach); } .hc.far { fill: var(--far); }
+.ax { fill: var(--muted); font-size: 12px; font-family: var(--font-body); }
+.axt { fill: var(--ink); font-size: 12.5px; font-weight: 600; font-family: var(--font-body); }
+.gridl { stroke: var(--line); stroke-width: 1; }
+.midbox { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-dasharray: 5 4; }
+.dot-in { fill: var(--likely); stroke: var(--surface); stroke-width: 1; }
+.dot-out { fill: var(--surface); stroke: var(--far); stroke-width: 1.6; }
+.me-dot { fill: var(--gold); stroke: var(--ink); stroke-width: 2; }
+.me-lab { fill: var(--ink); font-size: 12px; font-weight: 700; font-family: var(--font-body); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.wi-ring { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 3 2; }
+.clegend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); }
+.clegend span { display: inline-flex; align-items: center; gap: 6px; }
+.clegend svg { width: 14px; height: 14px; flex: none; }
+.shade { display: inline-flex; gap: 2px; }
+.shade i { width: 12px; height: 12px; border-radius: 2px; display: inline-block; opacity: .45; }
 
 .guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; align-items: start; }
 .guide ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
@@ -1180,6 +1197,8 @@ table.t tr:last-child td { border-bottom: 0; }
         (u.s ? '<div class="wi"><div class="wl"><label for="wiS">SAT</label><span id="wiSv">' + wiS + '</span></div><input type="range" id="wiS" min="800" max="1600" step="10" value="' + wiS + '"></div>' : '<p class="muted small" style="margin:0">' + esc(c.name) + " doesn't use test scores, so only GPA changes your odds here.</p>") +
         '<div class="wires" id="wiRes"></div><button type="button" class="btn small" data-wireset style="align-self:flex-start">Reset to my numbers</button></section>';
 
+      h += chartSection(c, e, p);
+
       var gmax = c.gs === "w" ? 4.6 : 4.5;
       h += '<section class="dsec"><h3>You vs. admitted students</h3>' +
         bar((c.gs === "w" ? "Weighted GPA" : "GPA") + (c.gsrc === "est" ? " (estimated)" : ""), u.g[0], u.g[1], u.myG, 2.5, gmax, function (v) { return v.toFixed(2); }) +
@@ -1219,6 +1238,133 @@ table.t tr:last-child td { border-bottom: 0; }
     var diff = Math.round(e.p * 100) - Math.round(now.p * 100);
     $("wiRes").innerHTML = '<span class="small">With these numbers:</span> <b class="c-' + tier(e.p) + '">' + Math.round(e.p * 100) + "%</b> <span class=\"small\">" + tierName(e) +
       (now.kind === "est" ? (diff ? " · " + (diff > 0 ? "+" : "−") + Math.abs(diff) + " from now" : " · same as now") : "") + "</span>";
+    var ring = $("wiRing");
+    if (ring) {
+      var pt = CH.pos(ov.gpa, ov.sat != null ? ov.sat : null, !!sEl);
+      ring.setAttribute("cx", pt[0]); ring.setAttribute("cy", pt[1]);
+      ring.style.display = (ui.wi ? "" : "none");
+    }
+  }
+
+  /* ---------- "Where you stand" chart ----------
+     Background: your estimated chance at every GPA/SAT combination (same model as everything else).
+     Dashed box: the college's published middle 50% of admitted students (real data).
+     Dots: SIMULATED applicants drawn around the published ranges, with outcomes rolled from the same model.
+     Real applicant-by-applicant results aren't public, so the dots are labeled as simulated everywhere. */
+  var CH = {
+    W: 400, H: 300, x0: 50, x1: 388, y0: 12, y1: 248,
+    sx: function (sat) { return this.x0 + (clamp(sat, 800, 1600) - 800) / 800 * (this.x1 - this.x0); },
+    gy: function (g) { return this.y1 - (clamp(g, 2, 4.5) - 2) / 2.5 * (this.y1 - this.y0); },
+    // GPA-only colleges put GPA on the x axis instead.
+    gx: function (g) { return this.x0 + (clamp(g, 2, 4.5) - 2) / 2.5 * (this.x1 - this.x0); },
+    pos: function (g, sat, hasSat) { return hasSat ? [this.sx(sat || 1200), this.gy(g)] : [this.gx(g), (this.y0 + this.y1) / 2]; }
+  };
+  function seeded(str) {
+    var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return function () { h += 0x6D2B79F5; var t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  function gauss(rnd) { var u = 1 - rnd(), v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+  function chartSection(c, e, p) {
+    var u = e.used, hasSat = !!u.s, R = u.R;
+    var cells = "", dots = "", grid = "", axes = "";
+    var neutral = {};
+    for (var k in p) neutral[k] = p[k];
+    var sel = R < 0.3 ? 2 : R < 0.7 ? 1 : 0;
+    neutral.cs = { rigor: [2, 4, 8][sel], pltw: 0 }; neutral.as = { level: 3 }; neutral.essay = 3; neutral.fg = false; neutral.volunteer = "no";
+    neutral.send = true;
+    // 1) your-odds shading
+    if (hasSat) {
+      for (var gi = 0; gi < 10; gi++) for (var si = 0; si < 16; si++) {
+        var g = 2 + (gi + 0.5) * 0.25, sat = 800 + (si + 0.5) * 50;
+        var pr = estimate(c, p, { gpa: g, sat: sat }).p;
+        var x = CH.sx(800 + si * 50), y = CH.gy(2 + (gi + 1) * 0.25), w = CH.sx(850) - CH.sx(800), hh = CH.gy(2) - CH.gy(2.25);
+        cells += '<rect class="hc ' + tier(pr) + '" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + (w + 0.5).toFixed(1) + '" height="' + (hh + 0.5).toFixed(1) + '" opacity="' + (0.12 + 0.2 * Math.abs(pr - 0.5)).toFixed(2) + '"/>';
+      }
+    } else {
+      for (var gj = 0; gj < 20; gj++) {
+        var g2 = 2 + (gj + 0.5) * 0.125, pr2 = estimate(c, p, { gpa: g2 }).p;
+        cells += '<rect class="hc ' + tier(pr2) + '" x="' + CH.gx(2 + gj * 0.125).toFixed(1) + '" y="' + CH.y0 + '" width="' + (CH.gx(2.125) - CH.gx(2) + 0.5).toFixed(1) + '" height="' + (CH.y1 - CH.y0) + '" opacity="' + (0.12 + 0.2 * Math.abs(pr2 - 0.5)).toFixed(2) + '"/>';
+      }
+    }
+    // 2) grid + axes
+    var gT = [2, 2.5, 3, 3.5, 4, 4.5];
+    if (hasSat) {
+      gT.forEach(function (g) { var y = CH.gy(g); grid += '<line class="gridl" x1="' + CH.x0 + '" x2="' + CH.x1 + '" y1="' + y + '" y2="' + y + '"/>'; axes += '<text class="ax" x="' + (CH.x0 - 6) + '" y="' + (y + 4) + '" text-anchor="end">' + g.toFixed(1) + "</text>"; });
+      [800, 1000, 1200, 1400, 1600].forEach(function (v) { var x = CH.sx(v); grid += '<line class="gridl" x1="' + x + '" x2="' + x + '" y1="' + CH.y0 + '" y2="' + CH.y1 + '"/>'; axes += '<text class="ax" x="' + x + '" y="' + (CH.y1 + 16) + '" text-anchor="middle">' + v + "</text>"; });
+      axes += '<text class="axt" x="' + ((CH.x0 + CH.x1) / 2) + '" y="' + (CH.H - 4) + '" text-anchor="middle">SAT</text>';
+      axes += '<text class="axt" transform="translate(13 ' + ((CH.y0 + CH.y1) / 2) + ') rotate(-90)" text-anchor="middle">Weighted GPA</text>';
+    } else {
+      gT.forEach(function (g) { var x = CH.gx(g); grid += '<line class="gridl" x1="' + x + '" x2="' + x + '" y1="' + CH.y0 + '" y2="' + CH.y1 + '"/>'; axes += '<text class="ax" x="' + x + '" y="' + (CH.y1 + 16) + '" text-anchor="middle">' + g.toFixed(1) + "</text>"; });
+      axes += '<text class="axt" x="' + ((CH.x0 + CH.x1) / 2) + '" y="' + (CH.H - 4) + '" text-anchor="middle">Weighted GPA (this college doesn\'t use test scores)</text>';
+    }
+    // 3) published middle 50% of admitted students
+    var box = "";
+    if (hasSat) {
+      box = '<rect class="midbox" x="' + CH.sx(u.s[0]).toFixed(1) + '" y="' + CH.gy(u.g[1]).toFixed(1) + '" width="' + (CH.sx(u.s[1]) - CH.sx(u.s[0])).toFixed(1) + '" height="' + (CH.gy(u.g[0]) - CH.gy(u.g[1])).toFixed(1) + '"/>';
+    } else {
+      box = '<rect class="midbox" x="' + CH.gx(u.g[0]).toFixed(1) + '" y="' + (CH.y0 + 6) + '" width="' + (CH.gx(u.g[1]) - CH.gx(u.g[0])).toFixed(1) + '" height="' + (CH.y1 - CH.y0 - 12) + '"/>';
+    }
+    // 4) simulated applicants. Draw a pool around the published ranges, then shift the whole pool up or down
+    //    until the share admitted by the model matches the college's real admit rate.
+    var rnd = seeded(c.id + "|" + p.mcat), N = 140, admitted = 0;
+    var gMid = (u.g[0] + u.g[1]) / 2, gSD = Math.max(0.3, (u.g[1] - u.g[0]) / 1.35) * 1.2;
+    var sMid = hasSat ? (u.s[0] + u.s[1]) / 2 : 0, sSD = hasSat ? Math.max(80, (u.s[1] - u.s[0]) / 1.35) * 1.2 : 0;
+    var pool = [];
+    while (pool.length < N) {
+      var z1 = gauss(rnd), z2 = 0.5 * z1 + Math.sqrt(0.75) * gauss(rnd);
+      if (Math.abs(z1) > 2.4 || Math.abs(z2) > 2.4) continue; // keep dots off the chart edges
+      pool.push({ z1: z1, z2: z2, roll: rnd(), jit: rnd() });
+    }
+    function place(a, k) {
+      var g = clamp(gMid + (a.z1 - k) * gSD, 2.05, 4.45);
+      var sat = hasSat ? clamp(Math.round((sMid + (a.z2 - k) * sSD) / 10) * 10, 820, 1590) : null;
+      return { g: g, sat: sat };
+    }
+    function admitShare(k) {
+      var t = 0;
+      pool.forEach(function (a) { var q = place(a, k); t += estimate(c, neutral, hasSat ? { gpa: q.g, sat: q.sat } : { gpa: q.g }).p; });
+      return t / N;
+    }
+    var lo = -1.5, hi = 2.5;
+    for (var it = 0; it < 14; it++) { var mid = (lo + hi) / 2; if (admitShare(mid) > R) lo = mid; else hi = mid; }
+    var kk = (lo + hi) / 2;
+    pool.forEach(function (a) {
+      var q = place(a, kk);
+      var pa = estimate(c, neutral, hasSat ? { gpa: q.g, sat: q.sat } : { gpa: q.g }).p;
+      var inn = a.roll < pa; if (inn) admitted++;
+      var rawG = gMid + (a.z1 - kk) * gSD, rawS = hasSat ? sMid + (a.z2 - kk) * sSD : 1200;
+      if (rawG < 2 || rawG > 4.5 || rawS < 800 || rawS > 1600) return; // off the chart: counted, not drawn
+      var pt = CH.pos(q.g, q.sat, hasSat);
+      var py = hasSat ? pt[1] : CH.y0 + 14 + a.jit * (CH.y1 - CH.y0 - 28);
+      dots += '<circle class="' + (inn ? "dot-in" : "dot-out") + '" cx="' + pt[0].toFixed(1) + '" cy="' + py.toFixed(1) + '" r="3.6"/>';
+    });
+    // 5) you, and the dashed "trying" ring
+    var me = "";
+    if (p.wgpa != null) {
+      if (hasSat && !p.sat) {
+        var yy = CH.gy(p.wgpa);
+        me = '<line x1="' + CH.x0 + '" x2="' + CH.x1 + '" y1="' + yy + '" y2="' + yy + '" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 4"/><text class="me-lab" x="' + (CH.x1 - 4) + '" y="' + (yy - 6) + '" text-anchor="end">You (no SAT)</text>';
+      } else {
+        var mp = CH.pos(p.wgpa, p.sat, hasSat);
+        var lx = mp[0] > CH.x1 - 40 ? mp[0] - 12 : mp[0] + 12, anchor = mp[0] > CH.x1 - 40 ? "end" : "start";
+        me = '<circle class="me-dot" cx="' + mp[0].toFixed(1) + '" cy="' + mp[1].toFixed(1) + '" r="8"/><text class="me-lab" x="' + lx.toFixed(1) + '" y="' + (mp[1] - 10).toFixed(1) + '" text-anchor="' + anchor + '">You</text>';
+      }
+    }
+    var wi = ui.wi ? CH.pos(ui.wi.gpa, ui.wi.sat, hasSat) : [0, 0];
+    var ring = '<circle id="wiRing" class="wi-ring" cx="' + wi[0].toFixed(1) + '" cy="' + wi[1].toFixed(1) + '" r="11"' + (ui.wi ? "" : ' style="display:none"') + "/>";
+    var label = "Chart of weighted GPA" + (hasSat ? " and SAT" : "") + " at " + c.name + ". Your estimated chance is " + Math.round(e.p * 100) + "%. " +
+      "The dashed box is the middle half of admitted students. Dots are " + N + " simulated applicants, " + admitted + " admitted.";
+    var svg = '<svg id="standChart" viewBox="0 0 ' + CH.W + " " + CH.H + '" role="img" aria-label="' + esc(label) + '"><g>' + cells + "</g>" + grid + box + dots + me + ring + axes + "</svg>";
+    var dot = function (cls) { return '<svg viewBox="0 0 14 14" aria-hidden="true"><circle class="' + cls + '" cx="7" cy="7" r="5"/></svg>'; };
+    return '<section class="dsec"><h3>Where you stand</h3>' +
+      '<p class="muted small" style="margin:0">Tap anywhere on the chart to try those numbers.</p>' +
+      '<div class="chartwrap">' + svg + "</div>" +
+      '<div class="clegend"><span>' + dot("me-dot") + "You</span><span>" + dot("dot-in") + "Admitted (simulated)</span><span>" + dot("dot-out") + "Not admitted (simulated)</span>" +
+      '<span><svg viewBox="0 0 14 14" aria-hidden="true"><rect class="midbox" x="1.5" y="1.5" width="11" height="11"/></svg>Middle 50% of admitted students (real data)</span>' +
+      '<span><span class="shade"><i class="bg-far"></i><i class="bg-reach"></i><i class="bg-target"></i><i class="bg-likely"></i></span>Your odds at each spot</span></div>' +
+      '<p class="fine">The dots are ' + N + " simulated applicants, not real students: colleges don't publish who got in. They're spread around " + esc(c.name) + "'s published ranges, and " + admitted +
+      " of " + N + " were admitted by the same estimate that gives your chance (the real admit rate is " + (u.R * 100).toFixed(1).replace(/\.0$/, "") + "%). " +
+      "A few fall outside the chart's range and aren't drawn. For real Greenfield-Central results, ask your counselor for the Naviance or SCOIR scattergram.</p></section>";
   }
 
   function bar(label, lo, hi, me, min, max, fmt) {
@@ -1247,6 +1393,23 @@ table.t tr:last-child td { border-bottom: 0; }
   function changed() { S.example = false; save(); render(); }
   document.addEventListener("click", function (ev) {
     if (ev.target.id === "scrim") { closeCollege(); return; }
+    var chart = ev.target.closest("#standChart");
+    if (chart && ui.open) {
+      var r = chart.getBoundingClientRect(), vx = (ev.clientX - r.left) / r.width * CH.W, vy = (ev.clientY - r.top) / r.height * CH.H;
+      var hasSat = !!$("wiS");
+      var g, sat = null;
+      if (hasSat) {
+        g = 2 + (CH.y1 - clamp(vy, CH.y0, CH.y1)) / (CH.y1 - CH.y0) * 2.5;
+        sat = Math.round((800 + (clamp(vx, CH.x0, CH.x1) - CH.x0) / (CH.x1 - CH.x0) * 800) / 10) * 10;
+      } else {
+        g = 2 + (clamp(vx, CH.x0, CH.x1) - CH.x0) / (CH.x1 - CH.x0) * 2.5;
+      }
+      g = Math.round(g * 20) / 20;
+      $("wiG").value = g; if (hasSat) $("wiS").value = sat;
+      ui.wi = { gpa: g, sat: sat };
+      updateWhatIf(profile());
+      return;
+    }
     var t = ev.target.closest("[data-course],[data-act],[data-sport],[data-region],[data-major],[data-path],[data-open],[data-close],[data-star],[data-wireset],#reset,#copyCeeb");
     if (!t) return;
     if (t.dataset.open) { openCollege(t.dataset.open, t); return; }
